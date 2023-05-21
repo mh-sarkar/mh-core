@@ -1,7 +1,8 @@
 name: mh_core
-description: A new Flutter project.
+description: This Flutter package is a UI kit for all beginner and professional who want to developed fast.
+  This package also improved http request. Also load network images and error widgets. You can try this package.
+homepage: https://github.com/mh-sarkar/mh-core
 version: 0.0.1
-homepage:
 
 environment:
   sdk: '>=2.19.4 <3.0.0'
