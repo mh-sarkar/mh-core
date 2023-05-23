@@ -40,7 +40,7 @@ class CustomNetworkImage extends StatelessWidget {
   }) : super(key: key);
   final bool isFromAPI;
   final bool isPreviewPageNeed;
-  final bool? isPreviewPageAppBarNeed;
+  final bool isPreviewPageAppBarNeed;
   final String? previewPageTitle;
   final Color? previewPageTitleColor;
   final Color? previewPageAppBarColor;
@@ -67,16 +67,16 @@ class CustomNetworkImage extends StatelessWidget {
                   builder: (context) => ImagePreview(
                     imageList: [
                       isFromAPI
-                          ? networkImagePath!
-                          : networkImagePathFromAPI!.contains(apiUrl!.replaceAll(apiExtraSlag ?? '/api', ''))
+                          ? networkImagePathFromAPI!.contains(apiUrl!.replaceAll(apiExtraSlag ?? '/api', ''))
                               ? networkImagePathFromAPI!
                               : apiUrl!.replaceAll(apiExtraSlag ?? '/api', '') + networkImagePathFromAPI!
+                          : networkImagePath!
                     ],
                     index: 0,
                     title: previewPageTitle!,
-                    titleColor: previewPageTitleColor!,
-                    isAppBarShow: isPreviewPageAppBarNeed!,
-                    appBarColor: previewPageAppBarColor!,
+                    titleColor: previewPageTitleColor,
+                    isAppBarShow: isPreviewPageAppBarNeed,
+                    appBarColor: previewPageAppBarColor,
                   ),
                 ),
               )
