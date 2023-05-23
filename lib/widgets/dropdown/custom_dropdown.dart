@@ -154,16 +154,19 @@ class TitleDropdown extends StatelessWidget {
                           value: type == DropdownListType.none ? item : item[valueKey],
                           child: Align(
                             alignment: Alignment.centerLeft,
-                            child: Text(
-                              type == DropdownListType.none ? item : item[viewKey],
-                              style: textStyle ??
-                                  const TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 12,
-                                  ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: horizontalContentPadding ?? 8),
+                              child: Text(
+                                type == DropdownListType.none ? item : item[viewKey],
+                                style: textStyle ??
+                                    const TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 12,
+                                    ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
                             ),
                           ),
                         ),
