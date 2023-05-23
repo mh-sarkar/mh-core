@@ -73,7 +73,7 @@ class CustomNetworkImage extends StatelessWidget {
                           : networkImagePath!
                     ],
                     index: 0,
-                    title: previewPageTitle!,
+                    title: previewPageTitle,
                     titleColor: previewPageTitleColor,
                     isAppBarShow: isPreviewPageAppBarNeed,
                     appBarColor: previewPageAppBarColor,
@@ -130,7 +130,7 @@ class CustomNetworkImage extends StatelessWidget {
 class ImagePreview extends StatefulWidget {
   List<String> imageList;
   int index;
-  String title;
+  String? title;
   Color? titleColor;
   bool isAppBarShow;
   Color? appBarColor;
@@ -139,7 +139,7 @@ class ImagePreview extends StatefulWidget {
       {Key? key,
       required this.imageList,
       required this.index,
-      required this.title,
+      this.title,
       this.titleColor = Colors.black,
       this.isAppBarShow = true,
       this.appBarColor = Colors.white})
@@ -162,7 +162,7 @@ class _ImagePreviewState extends State<ImagePreview> {
               // automaticallyImplyLeading: false,
               backgroundColor: widget.appBarColor,
               title: Text(
-                widget.title,
+                widget.title ?? "Untitled Image",
                 style: TextStyle(
                   color: widget.titleColor,
                   fontWeight: FontWeight.w700,
