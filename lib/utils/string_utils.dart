@@ -1,9 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:mh_core/utils/global.dart';
 
 String getTitle(String englishName, String banglaName) {
-  return Platform.localeName == const Locale('en', 'US') ? englishName : banglaName;
+  return locale == const Locale('en', 'US') ? englishName : banglaName;
 }
 
 dynamic getModelInfo(String id, List listData) {

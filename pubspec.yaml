@@ -17,6 +17,9 @@ dependencies:
   #Use for network call
   http: ^0.13.4
 
+  #Use for time date
+  intl: ^0.18.0
+
   #####################Dev Tools#####################
 
   #For Development Purpose ///working like print
