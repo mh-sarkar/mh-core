@@ -15,7 +15,25 @@ String getTime(String data) {
   } else if (data.length == 5) {
     return "${data.substring(0, data.indexOf(':'))} m ${data.substring(data.indexOf(':') + 1, data.length)} s";
   } else {
-    return "${data.substring(0, data.indexOf(' hour,'))} h ${data.substring(data.indexOf('hour,') + 6, data.indexOf(':'))} m ${data.substring(data.indexOf(':') + 1, data.length)} s";
+    if(data.length == 8){
+      return "${data.substring(0, data.indexOf(':'))} h ${data.substring(data.indexOf(':') + 1, data.nThIndexOf(":", 2))} m ${data.substring(data.nThIndexOf(":", 2) + 1, data.length)} s";
+    }else {
+      return "${data.substring(0, data.indexOf(' hour,'))} h ${data.substring(data.indexOf('hour,') + 6, data.indexOf(':'))} m ${data.substring(data.indexOf(':') + 1, data.length)} s";
+    }
+  }
+}
+
+extension NthOccurrenceOfSubstring on String {
+  int nThIndexOf(String stringToFind, int n){
+    if(indexOf(stringToFind)== -1)return -1;
+    if(n==1) return indexOf(stringToFind);
+
+    int subIndex = -1;
+    while(n>0){
+      subIndex = indexOf(stringToFind, subIndex+1);
+      n--;
+    }
+    return subIndex;
   }
 }
 

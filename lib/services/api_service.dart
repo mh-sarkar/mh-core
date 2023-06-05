@@ -6,6 +6,7 @@ import 'package:mh_core/utils/global.dart';
 import 'package:mh_core/widgets/button/custom_button.dart';
 
 enum HttpMethod { get, post, put, patch, del, multipartFilePost }
+enum HttpPurpose { restAPI, webScraping }
 
 class ServiceAPI {
   static domain(String path) => _url = path;
@@ -66,6 +67,7 @@ class ServiceAPI {
   static Future<dynamic> genericCall({
     required String url,
     required HttpMethod httpMethod,
+     HttpPurpose httpPurpose = HttpPurpose.restAPI,
     Map<String, String>? headers,
     Map<String, String>? allInfoField,
     List<Map<String, dynamic>>? imageListWithKeyValue,
@@ -190,6 +192,7 @@ class ServiceAPI {
         }
         // Get.closeAllSnackbars();
         snackbarKey!.currentState?.clearSnackBars();
+        if(httpPurpose == HttpPurpose.webScraping) return response.body;
         return jsonDecode(response.body);
       } else if (response.statusCode == 400) {
         showAlert("The request was invalid!");
