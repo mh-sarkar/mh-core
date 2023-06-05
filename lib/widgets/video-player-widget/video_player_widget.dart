@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mh_core/utils/global.dart';
 import 'package:video_player/video_player.dart';
 
 import 'basic_overlay_widget.dart';
@@ -16,6 +17,11 @@ class VideoPlayerWidget extends StatefulWidget {
 }
 
 class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
+  @override
+  void initState(){
+    globalLogger.d(widget.controller.value, "Controller Value");
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) => widget.controller.value.isInitialized
       ? Container(alignment: Alignment.topCenter, child: buildVideo())

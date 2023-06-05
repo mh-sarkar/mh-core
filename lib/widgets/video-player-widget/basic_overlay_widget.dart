@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:mh_core/utils/color/custom_color.dart';
 import 'package:mh_core/utils/constant.dart';
+import 'package:mh_core/utils/global.dart';
 import '../divider/custom_divider.dart';
 import '../video-player-widget/landscape_video.dart';
 import 'package:flutter/material.dart';
@@ -50,9 +51,7 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
 
   @override
   void initState() {
-    widget.controller.value.isPlaying
-        ? showOverlay = false
-        : showOverlay = true;
+    widget.controller.value.isPlaying ? showOverlay = false : showOverlay = true;
     PerfectVolumeControl.hideUI = true;
     PerfectVolumeControl.setVolume(.8);
     super.initState();
@@ -115,7 +114,7 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
 
   showOverlayResetTimer() {
     widget.showOverlayTime = 3;
-    print('cancdel ......................................');
+    print('cancel ......................................');
     setState(() {});
   }
 
@@ -129,6 +128,23 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
       showOverlayTimer!.cancel();
     }
     super.dispose();
+  }
+
+  _onTapDown(TapDownDetails details) {
+    // globalLogger.d(details.localPosition.dx, details.globalPosition.dx);
+    // var x = details.globalPosition.dx;
+    // var y = details.globalPosition.dy;
+    // // or user the local position method to get the offset
+    // print(details.localPosition);
+    // print("tap down " + x.toString() + ", " + y.toString());
+
+    if (details.localPosition.dx < 150) {
+      widget.controller.seekTo(Duration(seconds: widget.controller.value.position.inSeconds - 10));
+    } else if (details.localPosition.dx >= 150 && details.localPosition.dx <= 250) {
+      widget.controller.value.isPlaying ? widget.controller.pause() : widget.controller.play();
+    } else if (details.localPosition.dx > 250) {
+      widget.controller.seekTo(Duration(seconds: widget.controller.value.position.inSeconds + 10));
+    }
   }
 
   @override
@@ -148,6 +164,7 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
           }
         });
       },
+      onDoubleTapDown: (TapDownDetails details) => _onTapDown(details),
       child: showOverlay
           ? Stack(
               clipBehavior: Clip.none,
@@ -203,9 +220,7 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
       color: Colors.black26,
       child: InkWell(
         onTap: () {
-          widget.controller.value.isPlaying
-              ? widget.controller.pause()
-              : widget.controller.play();
+          widget.controller.value.isPlaying ? widget.controller.pause() : widget.controller.play();
           if (showOverlay && showOverlayTimer != null) {
             showOverlayTimer!.cancel();
             showOverlayResetTimer();
@@ -277,15 +292,11 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
               previousVolume = await PerfectVolumeControl.getVolume();
               startTimer();
             } else {
-              if (sliderValue == 0 &&
-                  previousVolume != null &&
-                  (previousVolume! * 10).ceil() != sliderValue) {
+              if (sliderValue == 0 && previousVolume != null && (previousVolume! * 10).ceil() != sliderValue) {
                 PerfectVolumeControl.setVolume(previousVolume!);
                 sliderValue = (previousVolume! * 10).ceil();
                 nowVolume = previousVolume;
-              } else if (sliderValue == 10 &&
-                  previousVolume != null &&
-                  (previousVolume! * 10).ceil() != sliderValue) {
+              } else if (sliderValue == 10 && previousVolume != null && (previousVolume! * 10).ceil() != sliderValue) {
                 PerfectVolumeControl.setVolume(0);
                 sliderValue = 0;
                 nowVolume = 0;
@@ -339,9 +350,7 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
             height: 30,
             width: 30,
             child: Icon(
-              MediaQuery.of(context).orientation == Orientation.landscape
-                  ? Icons.fullscreen_exit
-                  : Icons.fullscreen,
+              MediaQuery.of(context).orientation == Orientation.landscape ? Icons.fullscreen_exit : Icons.fullscreen,
               color: Colors.white,
               size: 25,
             ),
@@ -480,8 +489,7 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
                     ),
                   ),
                 ),
-              if (!(MediaQuery.of(context).orientation ==
-                  Orientation.landscape))
+              if (!(MediaQuery.of(context).orientation == Orientation.landscape))
                 Column(
                   children: List.generate(regulation.length, (index) {
                     return GestureDetector(
@@ -519,16 +527,16 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
               Text(
                 title,
                 style: regulationSelectedIndex == index
-                    ?  TextStyle(
+                    ? TextStyle(
                         color: CustomColor.kPrimaryColor,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                       )
-                    :  const TextStyle(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14,
-                  color: Colors.black,
-                ),
+                    : const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: Colors.black,
+                      ),
               ),
             ],
           ),
