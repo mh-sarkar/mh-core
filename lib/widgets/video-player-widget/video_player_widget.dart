@@ -6,21 +6,25 @@ import 'package:video_player/video_player.dart';
 import 'basic_overlay_widget.dart';
 
 class VideoPlayerWidget extends StatefulWidget {
-  VideoPlayerWidget({
+   VideoPlayerWidget({
     Key? key,
     required this.controller,
   }) : super(key: key);
 
   // final VideoPlayerController controller;
-  final MhVideoController controller;
+   MhVideoController controller;
 
   @override
   State<VideoPlayerWidget> createState() => _VideoPlayerWidgetState();
 }
 
 class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
+  int currentIndex = 0;
+
   @override
   void initState(){
+    final list = widget.controller.playList;
+    widget.controller = MhVideoController.network(initialDataSource: list[currentIndex][0]['link']);
     globalLogger.d(widget.controller.value, "Controller Value");
     super.initState();
   }

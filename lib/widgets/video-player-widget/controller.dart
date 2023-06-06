@@ -1,42 +1,124 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:html/parser.dart';
+import 'package:mh_core/services/api_service.dart';
+import 'package:mh_core/utils/global.dart';
 import 'package:video_player/video_player.dart';
 
-class MhVideoController  extends VideoPlayerController{
+class MhVideoController extends VideoPlayerController {
   // late final VideoPlayerController controller;
   // MhVideoController();
 
-  MhVideoController.asset(String dataSource,
-      {String? package, Future<ClosedCaptionFile>? closedCaptionFile, VideoPlayerOptions? videoPlayerOptions}) : super.asset(dataSource,
-      package: package, closedCaptionFile: closedCaptionFile, videoPlayerOptions: videoPlayerOptions);
+  final List<List<dynamic>> _playlist = [];
+  dynamic _currentPlay = {};
+  int _currentIndex = -1;
 
-  MhVideoController.network(String dataSource,
-      {VideoFormat? formatHint,
-        Future<ClosedCaptionFile>? closedCaptionFile,
-        VideoPlayerOptions? videoPlayerOptions,
-        Map<String, String> httpHeaders = const <String, String>{},
-      }) : super.network(dataSource,
-      formatHint: formatHint,
-      closedCaptionFile: closedCaptionFile,
-      videoPlayerOptions: videoPlayerOptions,
-      httpHeaders:httpHeaders) ;
+  setCurrentIndex(int currentIndex) {
+    _currentIndex = currentIndex;
+  }
 
-  MhVideoController.file(File file,
+  setCurrentPlay(dynamic currentPlay) {
+    _currentPlay = currentPlay;
+  }
+
+  setPlayList(List<String> playList) {
+    _playlist.clear();
+
+    playList.forEach((element) async {
+      _playlist.add(await checkUrlAndGetVideoId(element));
+    });
+  }
+
+  int get currentIndex => _currentIndex;
+  dynamic get currentPlay => _currentPlay;
+  List<List<dynamic>> get playList => _playlist;
+
+  Future<List<dynamic>> checkUrlAndGetVideoId(String url) async {
+    if (url.contains('youtu.be') || url.contains('youtube.com')) {
+      String? videoId;
+      if (url.contains('youtu.be')) {
+        videoId = url.substring(url.lastIndexOf('/') + 1, url.length);
+      } else if (url.contains('youtube.com')) {
+        videoId = url.substring(url.lastIndexOf('watch?v=') + 8, url.length);
+      }
+      final linkList = [];
+      final data = await ServiceAPI.genericCall(
+          url: "https://10downloader.com/download?v=http://www.youtube.com/watch?v=$videoId&utm_source=000tube",
+          httpMethod: HttpMethod.get,
+          httpPurpose: HttpPurpose.webScraping);
+      final document = parse(data);
+      final listTableData = document
+          .getElementsByTagName('body')[0]
+          .getElementsByClassName('downloadSection')[0]
+          .getElementsByClassName('downloadsTable')[0]
+          .getElementsByTagName('tbody')[0]
+          .getElementsByTagName('tr');
+      for (var e in listTableData) {
+        linkList.add({
+          "quality": e.getElementsByTagName('td')[0].innerHtml,
+          "link": e.getElementsByClassName('downloadBtn')[0].attributes['href'],
+        });
+      }
+
+      globalLogger.d(linkList);
+      return linkList;
+    }
+    return [
       {
-        Future<ClosedCaptionFile>? closedCaptionFile,
-        VideoPlayerOptions? videoPlayerOptions,
-        Map<String, String> httpHeaders = const <String, String>{},
-      }) : super.file(file,
-      closedCaptionFile: closedCaptionFile,
-      videoPlayerOptions: videoPlayerOptions,
-      httpHeaders:httpHeaders);
+        "quality": 'Auto',
+        "link": url,
+      }
+    ];
+  }
 
+  MhVideoController.asset({
+    required String initialDataSource,
+    String? package,
+    Future<ClosedCaptionFile>? closedCaptionFile,
+    VideoPlayerOptions? videoPlayerOptions,
+  }) : super.asset(
+          initialDataSource,
+          package: package,
+          closedCaptionFile: closedCaptionFile,
+          videoPlayerOptions: videoPlayerOptions,
+        );
 
-  MhVideoController.contentUri(Uri contentUri,Future<ClosedCaptionFile>? closedCaptionFile,
-      VideoPlayerOptions? videoPlayerOptions, ) : super.contentUri(contentUri,
-    closedCaptionFile: closedCaptionFile,
-    videoPlayerOptions: videoPlayerOptions,);
+  MhVideoController.network({
+    required String initialDataSource,
+    VideoFormat? formatHint,
+    Future<ClosedCaptionFile>? closedCaptionFile,
+    VideoPlayerOptions? videoPlayerOptions,
+    Map<String, String> httpHeaders = const <String, String>{},
+  }) : super.network(
+          initialDataSource,
+          formatHint: formatHint,
+          closedCaptionFile: closedCaptionFile,
+          videoPlayerOptions: videoPlayerOptions,
+          httpHeaders: httpHeaders,
+        );
+
+  MhVideoController.file({
+    required File initialFile,
+    Future<ClosedCaptionFile>? closedCaptionFile,
+    VideoPlayerOptions? videoPlayerOptions,
+    Map<String, String> httpHeaders = const <String, String>{},
+  }) : super.file(
+          initialFile,
+          closedCaptionFile: closedCaptionFile,
+          videoPlayerOptions: videoPlayerOptions,
+          httpHeaders: httpHeaders,
+        );
+
+  MhVideoController.contentUri({
+    required Uri contentUri,
+    Future<ClosedCaptionFile>? closedCaptionFile,
+    VideoPlayerOptions? videoPlayerOptions,
+  }) : super.contentUri(
+          contentUri,
+          closedCaptionFile: closedCaptionFile,
+          videoPlayerOptions: videoPlayerOptions,
+        );
 
   @override
   // TODO: implement textureId
@@ -51,6 +133,7 @@ class MhVideoController  extends VideoPlayerController{
   @override
   Future<void> initialize() {
     // TODO: implement initialize
+
     return super.initialize();
   }
 
@@ -89,6 +172,7 @@ class MhVideoController  extends VideoPlayerController{
     // TODO: implement setCaptionOffset
     super.setCaptionOffset(offset);
   }
+
   @override
   Future<void> setClosedCaptionFile(Future<ClosedCaptionFile>? closedCaptionFile) {
     // TODO: implement setClosedCaptionFile
@@ -120,5 +204,4 @@ class MhVideoController  extends VideoPlayerController{
   @override
   // TODO: implement position
   Future<Duration?> get position => super.position;
-
 }
