@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mh_core/widgets/video-player-widget/controller.dart';
 import 'package:mh_core/widgets/video-player-widget/video_player_widget.dart';
 import 'package:video_player/video_player.dart';
 
 class LandscapeVideo extends StatefulWidget {
   const LandscapeVideo({Key? key,  this.controller}) : super(key: key);
-final VideoPlayerController? controller;
+final MhVideoController? controller;
 
   @override
   State<LandscapeVideo> createState() => _LandscapeVideoState();

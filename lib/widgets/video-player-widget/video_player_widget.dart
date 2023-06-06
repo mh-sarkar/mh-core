@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mh_core/utils/global.dart';
+import 'package:mh_core/widgets/video-player-widget/controller.dart';
 import 'package:video_player/video_player.dart';
 
 import 'basic_overlay_widget.dart';
@@ -10,7 +11,8 @@ class VideoPlayerWidget extends StatefulWidget {
     required this.controller,
   }) : super(key: key);
 
-  final VideoPlayerController controller;
+  // final VideoPlayerController controller;
+  final MhVideoController controller;
 
   @override
   State<VideoPlayerWidget> createState() => _VideoPlayerWidgetState();

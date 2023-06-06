@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:mh_core/utils/color/custom_color.dart';
 import 'package:mh_core/utils/constant.dart';
 import 'package:mh_core/utils/global.dart';
+import 'package:mh_core/widgets/video-player-widget/controller.dart';
 import '../divider/custom_divider.dart';
 import '../video-player-widget/landscape_video.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,7 @@ class BasicOverlayWidget extends StatefulWidget {
     this.showOverlayTime = 3,
   }) : super(key: key);
 
-  VideoPlayerController controller;
+  MhVideoController controller;
   int volumeBarActiveTime;
   int showOverlayTime;
   @override
