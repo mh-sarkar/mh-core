@@ -104,6 +104,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
           Positioned.fill(
             child: BasicOverlayWidget(
                 controller: widget.controller,
+                videoList: widget.videoList,
                 onResolutionChanged: (val) {
                   _getValuesAndPlay(val['link']);
                 },

@@ -17,6 +17,7 @@ class BasicOverlayWidget extends StatefulWidget {
     required this.onResolutionChanged,
     required this.onNextPress,
     required this.onPreviousPress,
+     this.videoList,
     this.volumeBarActiveTime = 3,
     this.showOverlayTime = 3,
   }) : super(key: key);
@@ -27,33 +28,18 @@ class BasicOverlayWidget extends StatefulWidget {
   Function(dynamic) onResolutionChanged;
   Function(int) onNextPress;
   Function(int) onPreviousPress;
+  List<String>? videoList;
   @override
   State<BasicOverlayWidget> createState() => _BasicOverlayWidgetState();
 }
 
 class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
-  final List regulation = [
-    'Auto',
-    '360 P',
-    '480 P',
-    '720 P',
-    '1080 P',
-  ];
-
-  int regulationSelectedIndex = 0;
-
   int sliderValue = 8;
-
   bool showVolumeSlider = false;
-
   bool showOverlay = false;
-
   Timer? volumeSliderShowTimer;
-
   Timer? showOverlayTimer;
-
   double? previousVolume;
-
   double? nowVolume;
 
   @override
@@ -176,9 +162,12 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
           ? Stack(
               clipBehavior: Clip.none,
               children: [
-                buildPrevious(),
+
                 buildPlay(),
-                buildNext(),
+                if(widget.controller.currentIndex>0)
+                  buildPrevious(),
+                if(widget.controller.currentIndex<widget.videoList!.length-1)
+                  buildNext(),
                 Positioned(
                   left: 0,
                   right: 0,
@@ -206,6 +195,8 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
   Widget buildPrevious() {
     return GestureDetector(
       onTap: () {
+        globalLogger.d("Previous Pressed");
+        globalLogger.d(widget.controller.currentIndex);
         if (widget.controller.currentIndex > 0) {
           widget.onPreviousPress(widget.controller.currentIndex - 1);
         }
@@ -260,8 +251,11 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
   Widget buildNext() {
     return GestureDetector(
       onTap: () {
-        globalLogger.d("Next Pressed");
-        if (widget.controller.currentIndex < widget.controller.playList.length - 1) {
+        // globalLogger.d("Next Pressed");
+        // globalLogger.d(widget.controller.currentIndex);
+        // globalLogger.d(widget.videoList!.length - 1);
+        // globalLogger.d(widget.controller.currentIndex< widget.videoList!.length - 1);
+        if (widget.controller.currentIndex < widget.videoList!.length - 1) {
           widget.onPreviousPress(widget.controller.currentIndex + 1);
         }
       },
