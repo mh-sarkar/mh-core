@@ -5,20 +5,56 @@ import 'package:html/parser.dart';
 import 'package:mh_core/services/api_service.dart';
 import 'package:mh_core/utils/global.dart';
 import 'package:video_player/video_player.dart';
+Future<List<dynamic>> checkUrlAndGetVideoId(String url) async {
+  if (url.contains('youtu.be') || url.contains('youtube.com')) {
+    String? videoId;
+    if (url.contains('youtu.be')) {
+      videoId = url.substring(url.lastIndexOf('/') + 1, url.length);
+    } else if (url.contains('youtube.com')) {
+      videoId = url.substring(url.lastIndexOf('watch?v=') + 8, url.length);
+    }
+    final linkList = [];
+    final data = await ServiceAPI.genericCall(
+        url: "https://10downloader.com/download?v=http://www.youtube.com/watch?v=$videoId&utm_source=000tube",
+        httpMethod: HttpMethod.get,
+        httpPurpose: HttpPurpose.webScraping);
+    final document = parse(data);
+    final listTableData = document
+        .getElementsByTagName('body')[0]
+        .getElementsByClassName('downloadSection')[0]
+        .getElementsByClassName('downloadsTable')[0]
+        .getElementsByTagName('tbody')[0]
+        .getElementsByTagName('tr');
+    for (var e in listTableData) {
+      linkList.add({
+        "quality": e.getElementsByTagName('td')[0].innerHtml,
+        "link": e.getElementsByClassName('downloadBtn')[0].attributes['href'],
+      });
+    }
 
+    globalLogger.d(linkList);
+    return linkList;
+  }
+  return [
+    {
+      "quality": 'Auto',
+      "link": url,
+    }
+  ];
+}
 class MhVideoController extends VideoPlayerController {
   // late final VideoPlayerController controller;
   // MhVideoController();
 
   final List<List<dynamic>> _playlist = [];
-  dynamic _currentPlay = {};
+  List<dynamic> _currentPlay = [];
   int _currentIndex = -1;
 
   setCurrentIndex(int currentIndex) {
     _currentIndex = currentIndex;
   }
 
-  setCurrentPlay(dynamic currentPlay) {
+  setCurrentPlay(List<dynamic> currentPlay) {
     _currentPlay = currentPlay;
   }
 
@@ -31,7 +67,7 @@ class MhVideoController extends VideoPlayerController {
   }
 
   int get currentIndex => _currentIndex;
-  dynamic get currentPlay => _currentPlay;
+  List<dynamic> get currentPlay => _currentPlay;
   List<List<dynamic>> get playList => _playlist;
 
   Future<List<dynamic>> checkUrlAndGetVideoId(String url) async {

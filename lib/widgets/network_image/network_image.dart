@@ -116,7 +116,7 @@ class CustomNetworkImage extends StatelessWidget {
                     : Icon(
                         errorIconData ?? Icons.error,
                         color: imageColor ?? Colors.red,
-                        size: height ?? MediaQuery.of(context).size.width * .3,
+                        size: width ?? MediaQuery.of(context).size.width * .3,
                       );
               }),
           height: height ?? MediaQuery.of(context).size.width * .3,

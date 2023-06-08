@@ -14,6 +14,9 @@ class BasicOverlayWidget extends StatefulWidget {
   BasicOverlayWidget({
     Key? key,
     required this.controller,
+    required this.onResolutionChanged,
+    required this.onNextPress,
+    required this.onPreviousPress,
     this.volumeBarActiveTime = 3,
     this.showOverlayTime = 3,
   }) : super(key: key);
@@ -21,6 +24,9 @@ class BasicOverlayWidget extends StatefulWidget {
   MhVideoController controller;
   int volumeBarActiveTime;
   int showOverlayTime;
+  Function(dynamic) onResolutionChanged;
+  Function(int) onNextPress;
+  Function(int) onPreviousPress;
   @override
   State<BasicOverlayWidget> createState() => _BasicOverlayWidgetState();
 }
@@ -198,17 +204,24 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
   }
 
   Widget buildPrevious() {
-    return Container(
-      alignment: Alignment.centerLeft,
-      child: const Padding(
-        padding: EdgeInsets.only(left: 20),
-        child: CircleAvatar(
-          radius: 18,
-          backgroundColor: Colors.white54,
-          child: Icon(
-            Icons.keyboard_arrow_left_outlined,
-            color: Colors.black87,
-            size: 30,
+    return GestureDetector(
+      onTap: () {
+        if (widget.controller.currentIndex > 0) {
+          widget.onPreviousPress(widget.controller.currentIndex - 1);
+        }
+      },
+      child: Container(
+        alignment: Alignment.centerLeft,
+        child: const Padding(
+          padding: EdgeInsets.only(left: 20),
+          child: CircleAvatar(
+            radius: 18,
+            backgroundColor: Colors.white54,
+            child: Icon(
+              Icons.keyboard_arrow_left_outlined,
+              color: Colors.black87,
+              size: 30,
+            ),
           ),
         ),
       ),
@@ -245,17 +258,25 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
   }
 
   Widget buildNext() {
-    return Container(
-      alignment: Alignment.centerRight,
-      child: const Padding(
-        padding: EdgeInsets.only(right: 20),
-        child: CircleAvatar(
-          radius: 18,
-          backgroundColor: Colors.white54,
-          child: Icon(
-            Icons.keyboard_arrow_right_outlined,
-            color: Colors.black87,
-            size: 30,
+    return GestureDetector(
+      onTap: () {
+        globalLogger.d("Next Pressed");
+        if (widget.controller.currentIndex < widget.controller.playList.length - 1) {
+          widget.onPreviousPress(widget.controller.currentIndex + 1);
+        }
+      },
+      child: Container(
+        alignment: Alignment.centerRight,
+        child: const Padding(
+          padding: EdgeInsets.only(right: 20),
+          child: CircleAvatar(
+            radius: 18,
+            backgroundColor: Colors.white54,
+            child: Icon(
+              Icons.keyboard_arrow_right_outlined,
+              color: Colors.black87,
+              size: 30,
+            ),
           ),
         ),
       ),
@@ -471,17 +492,22 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
                 Expanded(
                   child: SingleChildScrollView(
                     child: Column(
-                      children: List.generate(regulation.length, (index) {
+                      children: List.generate(widget.controller.currentPlay.length, (index) {
                         return GestureDetector(
                           onTap: () {
-                            setState(() {
-                              regulationSelectedIndex = index;
-                            });
+                            // setState(() {
+                            //   regulationSelectedIndex = index;
+                            // });
+                            if (widget.controller.currentIndex != index) {
+                              widget.controller.setCurrentIndex(index);
+                              widget.onResolutionChanged(widget.controller.currentPlay[index]);
+                            }
+                            Navigator.pop(context);
                           },
                           child: Container(
                             color: Colors.white,
                             child: buildRegulationItem(
-                              title: regulation[index],
+                              title: widget.controller.currentPlay[index]['quality'],
                               index: index,
                             ),
                           ),
@@ -492,17 +518,22 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
                 ),
               if (!(MediaQuery.of(context).orientation == Orientation.landscape))
                 Column(
-                  children: List.generate(regulation.length, (index) {
+                  children: List.generate(widget.controller.currentPlay.length, (index) {
                     return GestureDetector(
                       onTap: () {
-                        setState(() {
-                          regulationSelectedIndex = index;
-                        });
+                        // setState(() {
+                        //   regulationSelectedIndex = index;
+                        // });
+                        if (widget.controller.currentIndex != index) {
+                          widget.controller.setCurrentIndex(index);
+                          widget.onResolutionChanged(widget.controller.currentPlay[index]);
+                        }
+                        Navigator.pop(context);
                       },
                       child: Container(
                         color: Colors.white,
                         child: buildRegulationItem(
-                          title: regulation[index],
+                          title: widget.controller.currentPlay[index]['quality'],
                           index: index,
                         ),
                       ),
@@ -527,7 +558,7 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
             children: [
               Text(
                 title,
-                style: regulationSelectedIndex == index
+                style: widget.controller.currentIndex == index
                     ? TextStyle(
                         color: CustomColor.kPrimaryColor,
                         fontSize: 14,
