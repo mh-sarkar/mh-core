@@ -11,7 +11,7 @@ enum HttpPurpose { restAPI, webScraping }
 class ServiceAPI {
   static domain(String path) => _url = path;
   static get url => _url;
-  static extraSlag(String path) => _apiUrl = _url + path;
+  static extraSlag(String? path) => _apiUrl = _url + (path??'');
   static get apiUrl => _apiUrl;
   static setAuthToken(String token) => _authToken = token;
   static delAuthToken(_) => _authToken = '';
