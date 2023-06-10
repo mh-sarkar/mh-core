@@ -6,18 +6,22 @@ import 'package:mh_core/utils/global.dart';
 import 'package:mh_core/widgets/button/custom_button.dart';
 
 enum HttpMethod { get, post, put, patch, del, multipartFilePost }
+
 enum HttpPurpose { restAPI, webScraping }
 
 class ServiceAPI {
   static domain(String path) => _url = path;
   static get url => _url;
-  static extraSlag(String? path) => _apiUrl = _url + (path??'');
+  static extraSlag(String? path) => _apiUrl = _url + (path ?? '');
   static get apiUrl => _apiUrl;
   static setAuthToken(String token) => _authToken = token;
   static delAuthToken(_) => _authToken = '';
   static String _url = '';
   static String _apiUrl = '';
   static String _authToken = '';
+  static GlobalKey<NavigatorState>? _navigatorKey;
+  static setNavigatorKey(GlobalKey<NavigatorState> key) => _navigatorKey = key;
+
   // static const String apiUrl = "http://pos.wiztecbd.online/api/";
 
   /// Multiple data add on multiple fields
@@ -67,7 +71,7 @@ class ServiceAPI {
   static Future<dynamic> genericCall({
     required String url,
     required HttpMethod httpMethod,
-     HttpPurpose httpPurpose = HttpPurpose.restAPI,
+    HttpPurpose httpPurpose = HttpPurpose.restAPI,
     Map<String, String>? headers,
     Map<String, String>? allInfoField,
     List<Map<String, dynamic>>? imageListWithKeyValue,
@@ -76,6 +80,8 @@ class ServiceAPI {
     Encoding? encoding,
     bool noNeedAuthToken = false,
     bool isLoadingEnable = false,
+    bool isFailedResponseNeed = false,
+    bool defaultErrorMsgShow = true,
     bool isErrorHandleButtonExists = false,
     String? errorButtonLabel,
     Function()? errorButtonPressed,
@@ -88,15 +94,19 @@ class ServiceAPI {
         var request = http.MultipartRequest("POST", urlL);
         request.headers.addAll(noNeedAuthToken
             ? headers ?? {}
-            : {'Content-Type': 'application/json; charset=UTF-8', 'Authorization': 'Bearer $_authToken'});
+            : {
+                'Content-Type': 'application/json; charset=UTF-8',
+                'Authorization': 'Bearer $_authToken'
+              });
         if (allInfoField != null) {
           request.fields.addAll(allInfoField);
         }
 
         if (imageListWithKeyValue != null) {
           for (int i = 0; i < imageListWithKeyValue.length; i++) {
-            request.files.add(
-                await http.MultipartFile.fromPath(imageListWithKeyValue[i]['key'], imageListWithKeyValue[i]['value']));
+            request.files.add(await http.MultipartFile.fromPath(
+                imageListWithKeyValue[i]['key'],
+                imageListWithKeyValue[i]['value']));
           }
         }
 
@@ -105,7 +115,8 @@ class ServiceAPI {
             if (multipleImageListWithKeyValue[i]['key'] != null) {
               List<http.MultipartFile> files = [];
               for (String path in multipleImageListWithKeyValue[i]['key']) {
-                var f = await http.MultipartFile.fromPath(multipleImageListWithKeyValue[i]['key'], path);
+                var f = await http.MultipartFile.fromPath(
+                    multipleImageListWithKeyValue[i]['key'], path);
                 files.add(f);
               }
               request.files.addAll(files);
@@ -118,8 +129,15 @@ class ServiceAPI {
         response = await http.Response.fromStream(res);
       } else {
         response = (httpMethod == HttpMethod.get
-            ? await http.get(urlL, headers: noNeedAuthToken ? headers : {'Content-Type': 'application/json; charset=UTF-8', 'Authorization': 'Bearer $_authToken'}).timeout(const Duration(seconds: 20),
-                onTimeout: () {
+            ? await http
+                .get(urlL,
+                    headers: noNeedAuthToken
+                        ? headers
+                        : {
+                            'Content-Type': 'application/json; charset=UTF-8',
+                            'Authorization': 'Bearer $_authToken'
+                          })
+                .timeout(const Duration(seconds: 20), onTimeout: () {
                 return http.Response('Token Error', 500);
               }).catchError((e) {
                 globalLogger.e(e.toString());
@@ -131,7 +149,8 @@ class ServiceAPI {
                         headers: noNeedAuthToken
                             ? headers
                             : {
-                                'Content-Type': 'application/json; charset=UTF-8',
+                                'Content-Type':
+                                    'application/json; charset=UTF-8',
                                 'Authorization': 'Bearer $_authToken'
                               },
                         body: body,
@@ -148,7 +167,8 @@ class ServiceAPI {
                             headers: noNeedAuthToken
                                 ? headers
                                 : {
-                                    'Content-Type': 'application/json; charset=UTF-8',
+                                    'Content-Type':
+                                        'application/json; charset=UTF-8',
                                     'Authorization': 'Bearer $_authToken'
                                   },
                             body: body,
@@ -165,25 +185,34 @@ class ServiceAPI {
                                 headers: noNeedAuthToken
                                     ? headers
                                     : {
-                                        'Content-Type': 'application/json; charset=UTF-8',
+                                        'Content-Type':
+                                            'application/json; charset=UTF-8',
                                         'Authorization': 'Bearer $_authToken'
                                       },
                                 body: body,
                                 encoding: encoding)
-                            .timeout(const Duration(seconds: 20), onTimeout: () {
+                            .timeout(const Duration(seconds: 20),
+                                onTimeout: () {
                             return http.Response('Token Error', 500);
                           }).catchError((e) {
                             globalLogger.e(e.toString());
                             return http.Response('Token Error', 500);
                           })
                         : await http.delete(urlL,
-                            headers: noNeedAuthToken ? headers : {'Content-Type': 'application/json; charset=UTF-8', 'Authorization': 'Bearer $_authToken'},
+                            headers: noNeedAuthToken
+                                ? headers
+                                : {
+                                    'Content-Type':
+                                        'application/json; charset=UTF-8',
+                                    'Authorization': 'Bearer $_authToken'
+                                  },
                             body: body,
                             encoding: encoding));
       }
       globalLogger.d(response.body);
       globalLogger.d(response.statusCode);
       if (isLoadingEnable) {
+
         navigatorKey!.currentState!.pop();
       }
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -192,36 +221,16 @@ class ServiceAPI {
         }
         // Get.closeAllSnackbars();
         snackbarKey!.currentState?.clearSnackBars();
-        if(httpPurpose == HttpPurpose.webScraping) return response.body;
+        if (httpPurpose == HttpPurpose.webScraping) return response.body;
         return jsonDecode(response.body);
-      } else if (response.statusCode == 400) {
-        showAlert("The request was invalid!");
-      } else if (response.statusCode == 401) {
-        if (!is401Call) {
-          is401Call = true;
-          showAlert("Invalid login credentials!",
-              errorHandleButton: isErrorHandleButtonExists
-                  ? CustomButton(
-                      primary: Colors.red,
-                      label: errorButtonLabel!,
-                      onPressed: errorButtonPressed,
-                      marginVertical: 8,
-                    )
-                  : null);
-        }
-      } else if (response.statusCode == 403) {
-        showAlert("You do not have enough permissions to perform this action!");
-      } else if (response.statusCode == 404) {
-        showAlert("The requested resource not found!");
-      } else if (response.statusCode == 405) {
-        showAlert("This request is not supported by the resource!");
-      } else if (response.statusCode == 409) {
-        showAlert("The request could not be completed due to a conflict!");
-      } else if (response.statusCode == 429) {
-        showAlert("Server is busy now!");
-      } else if (response.statusCode == 500) {
-        isErrorHandleButtonExists
-            ? showAlert("The request was not completed due to an internal error on the server side!",
+      } else if(defaultErrorMsgShow) {
+
+        if (response.statusCode == 400) {
+          showAlert("The request was invalid!");
+        } else if (response.statusCode == 401) {
+          if (!is401Call) {
+            is401Call = true;
+            showAlert("Invalid login credentials!",
                 errorHandleButton: isErrorHandleButtonExists
                     ? CustomButton(
                         primary: Colors.red,
@@ -229,14 +238,40 @@ class ServiceAPI {
                         onPressed: errorButtonPressed,
                         marginVertical: 8,
                       )
-                    : null)
-            : onInternet(onRetry: onInternetError);
-      } else if (response.statusCode == 503) {
-        showAlert("The server was unavailable!");
-      } else {
-        showAlert("Something went wrong!");
+                    : null);
+          }
+        } else if (response.statusCode == 403) {
+          showAlert(
+              "You do not have enough permissions to perform this action!");
+        } else if (response.statusCode == 404) {
+          showAlert("The requested resource not found!");
+        } else if (response.statusCode == 405) {
+          showAlert("This request is not supported by the resource!");
+        } else if (response.statusCode == 409) {
+          showAlert("The request could not be completed due to a conflict!");
+        } else if (response.statusCode == 429) {
+          showAlert("Server is busy now!");
+        } else if (response.statusCode == 500) {
+          isErrorHandleButtonExists
+              ? showAlert(
+                  "The request was not completed due to an internal error on the server side!",
+                  errorHandleButton: isErrorHandleButtonExists
+                      ? CustomButton(
+                          primary: Colors.red,
+                          label: errorButtonLabel!,
+                          onPressed: errorButtonPressed,
+                          marginVertical: 8,
+                        )
+                      : null)
+              : onInternet(onRetry: onInternetError);
+        } else if (response.statusCode == 503) {
+          showAlert("The server was unavailable!");
+        } else {
+          showAlert("Something went wrong!");
+        }
       }
-      return {};
+      return jsonDecode(response.body);
+
     } catch (e) {
       globalLogger.e(e);
       return {};
