@@ -8,17 +8,24 @@ import 'package:mh_core/widgets/button/custom_button.dart';
 enum HttpMethod { get, post, put, patch, del, multipartFilePost }
 
 enum HttpPurpose { restAPI, webScraping }
+String stringifyCookies(Map<String, String> cookies) =>
+    cookies.entries.map((e) => '${e.key}=${e.value}').join('; ');
 
 class ServiceAPI {
   static domain(String path) => _url = path;
   static get url => _url;
   static extraSlag(String? path) => _apiUrl = _url + (path ?? '');
   static get apiUrl => _apiUrl;
+  static get getCookie => _setCookie;
+  static setCookie(String cookie) => _setCookie = cookie;
   static setAuthToken(String token) => _authToken = token;
+  static setAuthTokenPrefix(String prefix) => _authTokenPrefix = prefix;
   static delAuthToken(_) => _authToken = '';
   static String _url = '';
   static String _apiUrl = '';
   static String _authToken = '';
+  static String _setCookie = '';
+  static String _authTokenPrefix = 'Bearer';
   static GlobalKey<NavigatorState>? _navigatorKey;
   static setNavigatorKey(GlobalKey<NavigatorState> key) => _navigatorKey = key;
 
@@ -88,16 +95,21 @@ class ServiceAPI {
     Function()? onInternetError,
   }) async {
     try {
+      globalLogger.d(_setCookie.replaceAll(";", "; "));
+      final authHeader = {
+        'Content-Type':
+        'application/json; charset=UTF-8',
+        'Authorization': '$_authTokenPrefix $_authToken',
+        'Cookie':  _setCookie.replaceAll(";", "; "),
+      };
+      globalLogger.d('$_authTokenPrefix $_authToken');
       final urlL = Uri.parse(url);
       dynamic response;
       if (httpMethod == HttpMethod.multipartFilePost) {
         var request = http.MultipartRequest("POST", urlL);
         request.headers.addAll(noNeedAuthToken
             ? headers ?? {}
-            : {
-                'Content-Type': 'application/json; charset=UTF-8',
-                'Authorization': 'Bearer $_authToken'
-              });
+            : authHeader);
         if (allInfoField != null) {
           request.fields.addAll(allInfoField);
         }
@@ -133,10 +145,7 @@ class ServiceAPI {
                 .get(urlL,
                     headers: noNeedAuthToken
                         ? headers
-                        : {
-                            'Content-Type': 'application/json; charset=UTF-8',
-                            'Authorization': 'Bearer $_authToken'
-                          })
+                        : authHeader)
                 .timeout(const Duration(seconds: 20), onTimeout: () {
                 return http.Response('Token Error', 500);
               }).catchError((e) {
@@ -148,11 +157,7 @@ class ServiceAPI {
                     .post(urlL,
                         headers: noNeedAuthToken
                             ? headers
-                            : {
-                                'Content-Type':
-                                    'application/json; charset=UTF-8',
-                                'Authorization': 'Bearer $_authToken'
-                              },
+                            : authHeader,
                         body: body,
                         encoding: encoding)
                     .timeout(const Duration(seconds: 20), onTimeout: () {
@@ -166,11 +171,7 @@ class ServiceAPI {
                         .put(urlL,
                             headers: noNeedAuthToken
                                 ? headers
-                                : {
-                                    'Content-Type':
-                                        'application/json; charset=UTF-8',
-                                    'Authorization': 'Bearer $_authToken'
-                                  },
+                                : authHeader,
                             body: body,
                             encoding: encoding)
                         .timeout(const Duration(seconds: 20), onTimeout: () {
@@ -184,11 +185,7 @@ class ServiceAPI {
                             .patch(urlL,
                                 headers: noNeedAuthToken
                                     ? headers
-                                    : {
-                                        'Content-Type':
-                                            'application/json; charset=UTF-8',
-                                        'Authorization': 'Bearer $_authToken'
-                                      },
+                                    : authHeader,
                                 body: body,
                                 encoding: encoding)
                             .timeout(const Duration(seconds: 20),
@@ -201,18 +198,23 @@ class ServiceAPI {
                         : await http.delete(urlL,
                             headers: noNeedAuthToken
                                 ? headers
-                                : {
-                                    'Content-Type':
-                                        'application/json; charset=UTF-8',
-                                    'Authorization': 'Bearer $_authToken'
-                                  },
+                                : authHeader,
                             body: body,
                             encoding: encoding));
       }
       globalLogger.d(response.body);
+      globalLogger.d(noNeedAuthToken);
+      globalLogger.d(authHeader);
+      globalLogger.d((response as http.Response).headers);
+      globalLogger.d((response).request!.headers);
+      if((response as http.Response).headers['set-cookie']!=null) {
+        _setCookie =(response as http.Response).headers['set-cookie']!.toString().split(";").where((e) => e.contains('csrftoken') || e.contains('sessionid') ).toList().map((e) => e.contains('csrftoken')?e+";":e.contains("sessionid")?e.substring(e.indexOf("sessionid")):'').toList().toString().replaceAll("[", "").replaceAll("]", "").replaceAll(", ", "");
+        globalLogger.d(_setCookie, "_setCookie");
+      }
+      globalLogger.d((response).request!.headers);
+
       globalLogger.d(response.statusCode);
       if (isLoadingEnable) {
-
         navigatorKey!.currentState!.pop();
       }
       if (response.statusCode == 200 || response.statusCode == 201) {
