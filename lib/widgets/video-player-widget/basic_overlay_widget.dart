@@ -17,7 +17,7 @@ class BasicOverlayWidget extends StatefulWidget {
     required this.onResolutionChanged,
     required this.onNextPress,
     required this.onPreviousPress,
-     this.videoList,
+    this.videoList,
     this.volumeBarActiveTime = 3,
     this.showOverlayTime = 3,
   }) : super(key: key);
@@ -34,7 +34,7 @@ class BasicOverlayWidget extends StatefulWidget {
 }
 
 class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
-  int sliderValue = 8;
+  int sliderValue = 3;
   bool showVolumeSlider = false;
   bool showOverlay = false;
   Timer? volumeSliderShowTimer;
@@ -162,17 +162,22 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
           ? Stack(
               clipBehavior: Clip.none,
               children: [
-
                 buildPlay(),
-                if(widget.controller.currentIndex>0)
-                  buildPrevious(),
-                if(widget.controller.currentIndex<widget.videoList!.length-1)
-                  buildNext(),
+                if (widget.controller.currentIndex > 0) buildPrevious(),
+                if (widget.controller.currentIndex < widget.videoList!.length - 1) buildNext(),
                 Positioned(
                   left: 0,
                   right: 0,
                   bottom: 0,
                   child: buildIndicator(),
+                ),
+                Positioned(
+                  left: 12,
+                  bottom: 10,
+                  child: Text(
+                    "${(widget.controller.value.position.inSeconds / 60).floor()}:${(widget.controller.value.position.inSeconds % 60)}/${(widget.controller.value.duration.inSeconds / 60).floor()}:${(widget.controller.value.duration.inSeconds % 60)}",
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
                 Positioned(
                   right: 12,
@@ -198,6 +203,7 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
         globalLogger.d("Previous Pressed");
         globalLogger.d(widget.controller.currentIndex);
         if (widget.controller.currentIndex > 0) {
+          widget.controller.pause();
           widget.onPreviousPress(widget.controller.currentIndex - 1);
         }
       },
@@ -207,10 +213,10 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
           padding: EdgeInsets.only(left: 20),
           child: CircleAvatar(
             radius: 18,
-            backgroundColor: Colors.white54,
+            backgroundColor: Colors.black45,
             child: Icon(
-              Icons.keyboard_arrow_left_outlined,
-              color: Colors.black87,
+              Icons.skip_previous,
+              color: Colors.white,
               size: 30,
             ),
           ),
@@ -222,7 +228,7 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
   Widget buildPlay() {
     return Container(
       alignment: Alignment.center,
-      color: Colors.black26,
+      color: Colors.black54,
       child: InkWell(
         onTap: () {
           widget.controller.value.isPlaying ? widget.controller.pause() : widget.controller.play();
@@ -237,10 +243,10 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
         },
         child: CircleAvatar(
           radius: 30,
-          backgroundColor: Colors.white54,
+          backgroundColor: Colors.black45,
           child: Icon(
             widget.controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
-            color: Colors.black87,
+            color: Colors.white,
             size: 35,
           ),
         ),
@@ -251,11 +257,9 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
   Widget buildNext() {
     return GestureDetector(
       onTap: () {
-        // globalLogger.d("Next Pressed");
-        // globalLogger.d(widget.controller.currentIndex);
-        // globalLogger.d(widget.videoList!.length - 1);
-        // globalLogger.d(widget.controller.currentIndex< widget.videoList!.length - 1);
         if (widget.controller.currentIndex < widget.videoList!.length - 1) {
+          widget.controller.pause();
+
           widget.onPreviousPress(widget.controller.currentIndex + 1);
         }
       },
@@ -265,10 +269,10 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
           padding: EdgeInsets.only(right: 20),
           child: CircleAvatar(
             radius: 18,
-            backgroundColor: Colors.white54,
+            backgroundColor: Colors.black45,
             child: Icon(
-              Icons.keyboard_arrow_right_outlined,
-              color: Colors.black87,
+              Icons.skip_next,
+              color: Colors.white,
               size: 30,
             ),
           ),
@@ -281,6 +285,7 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
+        // Expanded(child: Text("0:03/5:12"),),
         GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: () {
@@ -344,6 +349,8 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
           behavior: HitTestBehavior.opaque,
           onTap: () async {
             if (MediaQuery.of(context).orientation == Orientation.portrait) {
+               SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,overlays :[]);
+
               SystemChrome.setPreferredOrientations([
                 DeviceOrientation.landscapeRight,
                 DeviceOrientation.landscapeLeft,
@@ -353,7 +360,7 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
                 MaterialPageRoute(
                     builder: (context) => LandscapeVideo(
                           controller: widget.controller,
-                        )),
+                        ),),
               );
             } else {
               SystemChrome.setPreferredOrientations([

@@ -10,11 +10,15 @@ class VideoPlayerWidget extends StatefulWidget {
     Key? key,
     required this.controller,
     this.videoList,
+    this.onNextPress,
+    this.onPreviousPress,
   }) : super(key: key);
 
   // final VideoPlayerController controller;
   MhVideoController controller;
   List<String>? videoList;
+  Function(int)? onNextPress;
+  Function(int)? onPreviousPress;
 
   @override
   State<VideoPlayerWidget> createState() => _VideoPlayerWidgetState();
@@ -23,14 +27,42 @@ class VideoPlayerWidget extends StatefulWidget {
 class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   int currentIndex = 0;
   Future<void>? _initializeVideoPlayerFuture;
-  int? _playBackTime;
+  // int? _playBackTime;
   List<dynamic> resVideo = [];
   //The values that are passed when changing quality
   Duration? newCurrentPosition;
   @override
   void initState() {
+    widget.controller.setCurrentIndex(0);
     globalLogger.d(widget.controller.value, "Controller Value");
     _newPlay();
+    listener = () {
+      globalLogger.d("_initializePlay Listener");
+      Duration duration = widget.controller.value.duration;
+      Duration position = widget.controller.value.position;
+      globalLogger.d(
+          widget.controller.currentIndex.toString() +
+              " " +
+              currentIndex.toString() +
+              " " +
+              (currentIndex == widget.controller.currentIndex).toString(),
+          "Listen");
+      globalLogger.d(duration.inSeconds, position.inSeconds);
+      if (duration.inSeconds == position.inSeconds &&
+          currentIndex == widget.controller.currentIndex &&
+          currentIndex < widget.videoList!.length - 1) {
+        widget.controller.setCurrentIndex(currentIndex + 1);
+      }
+      if (currentIndex != widget.controller.currentIndex) {
+        widget.controller.pause();
+        currentIndex = widget.controller.currentIndex;
+        if (mounted) setState(() {});
+        widget.onNextPress!(currentIndex);
+        _newPlay();
+      }
+      // _playBackTime = widget.controller.value.position.inSeconds;
+      if (mounted) setState(() {});
+    };
     super.initState();
   }
 
@@ -46,15 +78,12 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     return true;
   }
 
+  late VoidCallback listener;
   Future<void> _initializePlay(String videoPath) async {
     widget.controller = MhVideoController.network(initialDataSource: videoPath)
       ..setCurrentPlay(resVideo)
       ..setCurrentIndex(currentIndex);
-    widget.controller.addListener(() {
-      setState(() {
-        _playBackTime = widget.controller.value.position.inSeconds;
-      });
-    });
+    widget.controller.addListener(listener);
     _initializeVideoPlayerFuture = widget.controller.initialize().then((_) {
       widget.controller.seekTo(newCurrentPosition!);
       widget.controller.play();
@@ -62,15 +91,15 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   }
 
   void _getValuesAndPlay(String videoPath) {
-    newCurrentPosition = widget.controller.value.position;
+    // newCurrentPosition = widget.controller.value.position;
+    newCurrentPosition = Duration.zero;
     _startPlay(videoPath);
     print(newCurrentPosition.toString());
   }
 
   Future<void> _startPlay(String videoPath) async {
-    setState(() {
-      _initializeVideoPlayerFuture = null;
-    });
+    _initializeVideoPlayerFuture = null;
+    if (mounted) setState(() {});
     Future.delayed(const Duration(milliseconds: 200), () {
       _clearPrevious().then((_) {
         _initializePlay(videoPath);
@@ -99,6 +128,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         );
 
   Widget buildVideo() => Stack(
+    fit: MediaQuery.of(context).orientation == Orientation.portrait? StackFit.loose: StackFit.expand,
         children: [
           buildVideoPlayer(),
           Positioned.fill(
@@ -110,6 +140,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                 },
                 onNextPress: (val) {
                   globalLogger.d("Next Call $val");
+                  if (widget.onNextPress != null) widget.onNextPress!(val);
 
                   if (val != currentIndex) {
                     currentIndex = val;
@@ -119,6 +150,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
                 },
                 onPreviousPress: (val) {
                   globalLogger.d("Previous Call $val");
+                  if (widget.onPreviousPress != null) widget.onPreviousPress!(val);
                   if (val != currentIndex) {
                     currentIndex = val;
                     setState(() {});

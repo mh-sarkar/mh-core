@@ -218,6 +218,10 @@ class MhVideoController extends VideoPlayerController {
   @override
   // TODO: implement closedCaptionFile
   Future<ClosedCaptionFile>? get closedCaptionFile => super.closedCaptionFile;
+  bool _creationDispatched = false;
+  static final List<VoidCallback?> _emptyListeners = List<VoidCallback?>.filled(0, null);
+  List<VoidCallback?> _listeners = _emptyListeners;
+  int _count = 0;
 
   @override
   void addListener(VoidCallback listener) {

@@ -17,6 +17,8 @@ class _LandscapeVideoState extends State<LandscapeVideo> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: ()async{
+        await   SystemChrome.restoreSystemUIOverlays();
+
         await SystemChrome.setPreferredOrientations([
           DeviceOrientation.portraitUp,
           DeviceOrientation.portraitDown,
