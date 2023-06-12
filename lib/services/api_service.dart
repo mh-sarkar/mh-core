@@ -90,16 +90,19 @@ class ServiceAPI {
     bool isFailedResponseNeed = false,
     bool defaultErrorMsgShow = true,
     bool isErrorHandleButtonExists = false,
+    bool needCookie = false,
+    bool needJsonContentType = true,
     String? errorButtonLabel,
     Function()? errorButtonPressed,
     Function()? onInternetError,
   }) async {
     try {
-      globalLogger.d(_setCookie.replaceAll(";", "; "));
       final authHeader = {
+        if(needJsonContentType)
         'Content-Type':
         'application/json; charset=UTF-8',
         'Authorization': '$_authTokenPrefix $_authToken',
+        if(needCookie)
         'Cookie':  _setCookie.replaceAll(";", "; "),
       };
       globalLogger.d('$_authTokenPrefix $_authToken');
@@ -203,16 +206,10 @@ class ServiceAPI {
                             encoding: encoding));
       }
       globalLogger.d(response.body);
-      globalLogger.d(noNeedAuthToken);
-      globalLogger.d(authHeader);
-      globalLogger.d((response as http.Response).headers);
-      globalLogger.d((response).request!.headers);
       if((response as http.Response).headers['set-cookie']!=null) {
         _setCookie =(response as http.Response).headers['set-cookie']!.toString().split(";").where((e) => e.contains('csrftoken') || e.contains('sessionid') ).toList().map((e) => e.contains('csrftoken')?e+";":e.contains("sessionid")?e.substring(e.indexOf("sessionid")):'').toList().toString().replaceAll("[", "").replaceAll("]", "").replaceAll(", ", "");
         globalLogger.d(_setCookie, "_setCookie");
       }
-      globalLogger.d((response).request!.headers);
-
       globalLogger.d(response.statusCode);
       if (isLoadingEnable) {
         navigatorKey!.currentState!.pop();
