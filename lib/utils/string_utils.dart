@@ -17,8 +17,12 @@ String getTime(String data) {
   } else {
     if(data.length == 8){
       return "${data.substring(0, data.indexOf(':'))} h ${data.substring(data.indexOf(':') + 1, data.nThIndexOf(":", 2))} m ${data.substring(data.nThIndexOf(":", 2) + 1, data.length)} s";
-    }else {
+    }else if(data.toLowerCase().contains('hour')) {
       return "${data.substring(0, data.indexOf(' hour,'))} h ${data.substring(data.indexOf('hour,') + 6, data.indexOf(':'))} m ${data.substring(data.indexOf(':') + 1, data.length)} s";
+    }else if(data.toLowerCase().contains('minute')) {
+      return "${data.substring(0, data.indexOf(' minute,'))} m ${data.substring(data.indexOf('minute,') + 8, data.length)} s";
+    }else{
+      return "";
     }
   }
 }
