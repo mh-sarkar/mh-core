@@ -9,6 +9,15 @@ dynamic getModelInfo(String id, List listData) {
   return listData.where((e) => e.id == id).toList()[0];
 }
 
+String timeAgo({required String date}){
+return DateTime.now().difference(DateTime.parse(date)).inDays == 0
+    ? 'Today'
+    : (DateTime.now().difference(DateTime.parse(date)).inDays / 7).floor() ==
+    0
+    ? '${DateTime.now().difference(DateTime.parse(date)).inDays} days ago'
+    : '${(DateTime.now().difference(DateTime.parse(date)).inDays / 7).floor()} weeks ago';
+}
+
 String getTime(String data) {
   if (data.length == 3) {
     return "${data.replaceAll(':', '')} m 00 s";

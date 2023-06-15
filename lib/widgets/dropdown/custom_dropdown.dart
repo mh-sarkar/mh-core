@@ -30,6 +30,7 @@ class TitleDropdown extends StatelessWidget {
   final Color? rightIconBgColor;
   final TextStyle? hintTextStyle;
   final TextStyle? textStyle;
+  final TextStyle? titleStyle;
   final IconData? dropDownIconData;
   final double? horizontalContentPadding;
   final bool isFillColor;
@@ -55,6 +56,7 @@ class TitleDropdown extends StatelessWidget {
     this.circularBorderRadius,
     this.hintTextStyle,
     this.textStyle,
+    this.titleStyle,
     this.horizontalContentPadding,
     this.isFillColor = false,
     this.isBorder = true,
@@ -91,7 +93,7 @@ class TitleDropdown extends StatelessWidget {
         children: [
           if (isTitle)
             Text(title ?? '',
-                style: const TextStyle(
+                style:titleStyle?? const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 14,
                   color: Colors.black,
