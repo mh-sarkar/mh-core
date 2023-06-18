@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mh_core/utils/constant.dart';
+import 'package:mh_core/utils/global.dart';
 
 class RatingWidget extends StatelessWidget {
   final double rating;
@@ -37,6 +38,50 @@ class RatingWidget extends StatelessWidget {
             color: rating > 3 ? const Color(0xffFFA873) : const Color(0xff8C8FA5), size: 14),
         Icon(rating > 4 && rating < 5 ? Icons.star_half : Icons.star,
             color: rating > 4 ? const Color(0xffFFA873) : const Color(0xff8C8FA5), size: 14),
+      ],
+    );
+  }
+}
+
+class GiveARatingWidget extends StatefulWidget {
+  const GiveARatingWidget({super.key, this.rating = 0, this.onRating, this.enabled = true});
+  final int? rating;
+  final bool enabled;
+  final Function(int)? onRating;
+  @override
+  State<GiveARatingWidget> createState() => _GiveARatingWidgetState();
+}
+
+class _GiveARatingWidgetState extends State<GiveARatingWidget> {
+  int _selectedIndex = 0;
+  @override
+  void initState() {
+    // TODO: implement initState
+    _selectedIndex = widget.rating! <= 0 ? 0 : widget.rating! - 1;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ...List.generate(
+          5,
+          (index) {
+            return GestureDetector(
+              onTap: widget.enabled
+                  ? () {
+                      globalLogger.d(index);
+                      _selectedIndex = index;
+                      setState(() {});
+                      if (widget.onRating != null) widget.onRating!(index + 1);
+                    }
+                  : null,
+              child: Icon(Icons.star, color: _selectedIndex >= index ? const Color(0xffFFA873) : Colors.grey, size: 16),
+            );
+          },
+        ),
       ],
     );
   }
