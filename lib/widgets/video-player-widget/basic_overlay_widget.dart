@@ -46,7 +46,7 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
   void initState() {
     widget.controller.value.isPlaying ? showOverlay = false : showOverlay = true;
     PerfectVolumeControl.hideUI = true;
-    PerfectVolumeControl.setVolume(.8);
+    // PerfectVolumeControl.setVolume(.3);
     super.initState();
   }
 
@@ -260,7 +260,7 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
         if (widget.controller.currentIndex < widget.videoList!.length - 1) {
           widget.controller.pause();
 
-          widget.onPreviousPress(widget.controller.currentIndex + 1);
+          widget.onNextPress(widget.controller.currentIndex + 1);
         }
       },
       child: Container(
