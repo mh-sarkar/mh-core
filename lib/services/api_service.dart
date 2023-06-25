@@ -214,12 +214,13 @@ class ServiceAPI {
       if (isLoadingEnable) {
         navigatorKey!.currentState!.pop();
       }
+      if (is401Call) {
+        is401Call = false;
+      }
+      // Get.closeAllSnackbars();
+      snackbarKey!.currentState?.clearSnackBars();
       if (response.statusCode == 200 || response.statusCode == 201) {
-        if (is401Call) {
-          is401Call = false;
-        }
-        // Get.closeAllSnackbars();
-        snackbarKey!.currentState?.clearSnackBars();
+
         if (httpPurpose == HttpPurpose.webScraping) return response.body;
         return jsonDecode(response.body);
       } else if(defaultErrorMsgShow) {

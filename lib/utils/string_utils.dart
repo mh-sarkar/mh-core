@@ -18,6 +18,11 @@ return DateTime.now().difference(DateTime.parse(date)).inDays == 0
     : '${(DateTime.now().difference(DateTime.parse(date)).inDays / 7).floor()} weeks ago';
 }
 
+String chatTimeAgo({required String date}){
+  return DateTime.now().difference(DateTime.parse(date)).inDays>7?"${(DateTime.now().difference(DateTime.parse(date)).inDays/7).floor()} Weeks ago":DateTime.now().difference(DateTime.parse(date)).inHours>24?
+  "${DateTime.now().difference(DateTime.parse(date)).inDays} Days ago":DateTime.now().difference(DateTime.parse(date)).inMinutes>60?"${DateTime.now().difference(DateTime.parse(date)).inHours} Hours ago":DateTime.now().difference(DateTime.parse(date)).inSeconds>60?"${DateTime.now().difference(DateTime.parse(date)).inMinutes} Mins ago":"Just now";
+}
+
 String getTime(String data) {
   if (data.length == 3) {
     return "${data.replaceAll(':', '')} m 00 s";
