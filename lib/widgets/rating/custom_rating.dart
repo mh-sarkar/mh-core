@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mh_core/utils/constant.dart';
 import 'package:mh_core/utils/global.dart';
+import 'package:mh_core/utils/number_utils.dart';
 
 class RatingWidget extends StatelessWidget {
   final double rating;
@@ -28,7 +29,7 @@ class RatingWidget extends StatelessWidget {
       children: [
         if (showRatingValue)
           Text(
-            rating.toStringAsFixed(1),
+            localizationCheckForNumber(rating.toStringAsFixed(1)),
             style:  TextStyle(color: color, fontSize: fontSize?? 16, fontWeight: FontWeight.w600),
           ),
         if (showRatingValue) space1R,

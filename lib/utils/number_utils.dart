@@ -24,7 +24,7 @@ String percentCalculation(String mainPrice, String percent, [String discountPric
 
 dynamic localizationCheckForNumber(dynamic data) {
   if (data == null) return null;
-  if (locale.toString() == const Locale('bn_BD').toString()) {
+  if (locale!=null && locale.toString() == const Locale('bn_BD').toString()) {
     if (data.toString().contains('.00')) {
       return banNumber(data);
     } else if (data.toString().contains('.0')) {
@@ -39,7 +39,7 @@ dynamic localizationCheckForNumber(dynamic data) {
 }
 
 dynamic localizationDateTime(DateTime dateTime, [String dateFormat = 'dd MMM yyyy']) {
-  return DateFormat(dateFormat, locale.toString() == const Locale('bn_BD').toString() ? 'bn' : 'en').format(dateTime);
+  return DateFormat(dateFormat, locale!=null && locale.toString() == const Locale('bn_BD').toString() ? 'bn' : 'en').format(dateTime);
 }
 
 dynamic localizationEngForceFully(dynamic data) {
