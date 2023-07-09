@@ -90,7 +90,7 @@ class CustomNetworkImage extends StatelessWidget {
                   ? networkImagePathFromAPI!
                   : apiUrl!.replaceAll(apiExtraSlag ?? '/api', '') + networkImagePathFromAPI!
               : networkImagePath!,
-          fit: fit ?? BoxFit.fill,
+          fit: fit ?? BoxFit.cover,
           color: imageColor,
           loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
             if (loadingProgress == null) return child;
@@ -111,7 +111,7 @@ class CustomNetworkImage extends StatelessWidget {
                         color: imageColor,
                         height: height ?? MediaQuery.of(context).size.width * .3,
                         width: width ?? MediaQuery.of(context).size.width * .3,
-                        fit: fit ?? BoxFit.fill,
+                        fit: fit ?? BoxFit.cover,
                       )
                     : Icon(
                         errorIconData ?? Icons.error,

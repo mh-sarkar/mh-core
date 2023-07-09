@@ -6,7 +6,10 @@ import 'package:mh_core/services/api_service.dart';
 import 'package:mh_core/utils/global.dart';
 import 'package:video_player/video_player.dart';
 Future<List<dynamic>> checkUrlAndGetVideoId(String url) async {
+  globalLogger.d(url,"URL Found");
   if (url.contains('youtu.be') || url.contains('youtube.com')) {
+    globalLogger.d(1,"URL Found");
+
     String? videoId;
     if (url.contains('youtu.be')) {
       videoId = url.substring(url.lastIndexOf('/') + 1, url.length);

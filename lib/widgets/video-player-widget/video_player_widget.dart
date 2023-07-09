@@ -210,6 +210,7 @@ class _VideoPlayerWidgetV2State extends State<VideoPlayerWidgetV2> {
   MhVideoController? controller;
   @override
   void initState() {
+    globalLogger.d(widget.videoList!, "widget.videoList");
     if (widget.videoList!.isNotEmpty) {
       // globalLogger.d("Eibar AMI Call Holam");
 
@@ -220,6 +221,7 @@ class _VideoPlayerWidgetV2State extends State<VideoPlayerWidgetV2> {
       controller = MhVideoController.network(initialDataSource: widget.videoList![0])
         ..setCurrentIndex(0)
         ..initialize();
+      globalLogger.d(controller.toString(), "Controller Preview");
       _newPlay(false);
       // if (mounted) {
       //   setState(() {});
@@ -239,19 +241,21 @@ class _VideoPlayerWidgetV2State extends State<VideoPlayerWidgetV2> {
         //         (currentIndex == controller.currentIndex).toString(),
         //     "Listen");
         // globalLogger.d(duration.inSeconds, position.inSeconds);
-        if (duration.inSeconds == position.inSeconds &&
-            currentIndex == controller!.currentIndex &&
-            currentIndex < widget.videoList!.length - 1) {
-          controller!.setCurrentIndex(currentIndex + 1);
-          // if (currentIndex != controller.currentIndex) {
-          controller!.pause();
-          currentIndex = controller!.currentIndex;
-          if (mounted) setState(() {});
-          widget.onNextPress!(currentIndex);
-          globalLogger.d("Eibar NEW PLAY Call HOLO");
+        if (widget.videoList![controller!.currentIndex].isNotEmpty) {
+          if (duration.inSeconds == position.inSeconds &&
+              currentIndex == controller!.currentIndex &&
+              currentIndex < widget.videoList!.length - 1) {
+            controller!.setCurrentIndex(currentIndex + 1);
+            // if (currentIndex != controller.currentIndex) {
+            controller!.pause();
+            currentIndex = controller!.currentIndex;
+            if (mounted) setState(() {});
+            widget.onNextPress!(currentIndex);
+            globalLogger.d("Eibar NEW PLAY Call HOLO");
 
-          _newPlay();
-          // }
+            _newPlay();
+            // }
+          }
         }
 
         // _playBackTime = controller.value.position.inSeconds;
@@ -327,15 +331,19 @@ class _VideoPlayerWidgetV2State extends State<VideoPlayerWidgetV2> {
               child: Center(
                 child: CircularProgressIndicator(),
               ))
-          : controller!.value.isInitialized
-              ? Container(alignment: Alignment.topCenter, child: buildVideo())
-              : const SizedBox(
-                  height: 200,
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                )
-      :  Container(
+          : Container(alignment: Alignment.topCenter, child: buildVideo())
+
+      // controller!.value.isInitialized
+      //             ? Container(
+      //                 alignment: Alignment.topCenter,
+      //                 child: buildVideo())
+      //             : const SizedBox(
+      //                 height: 200,
+      //                 child: Center(
+      //                   child: CircularProgressIndicator(),
+      //                 ),
+      //               )
+      : Container(
           height: 200,
           color: Colors.black12,
           child: const Center(
@@ -346,34 +354,50 @@ class _VideoPlayerWidgetV2State extends State<VideoPlayerWidgetV2> {
   Widget buildVideo() => Stack(
         fit: MediaQuery.of(context).orientation == Orientation.portrait ? StackFit.loose : StackFit.expand,
         children: [
-          buildVideoPlayer(),
-          Positioned.fill(
-            child: BasicOverlayWidget(
-                controller: controller!,
-                videoList: widget.videoList,
-                onResolutionChanged: (val) {
-                  _getValuesAndPlay(val['link'], true);
-                },
-                onNextPress: (val) {
-                  globalLogger.d("Next Call $val and controller index ${controller!.currentIndex}");
-                  if (widget.onNextPress != null) widget.onNextPress!(val);
+          widget.videoList![currentIndex].isEmpty
+              ? Container(
+                  height: 200,
+                  color: Colors.black12,
+                  child: const Center(
+                    child: Text('Couldn\'t play this video'),
+                  ),
+                )
+              : controller!.value.isInitialized
+                  ? buildVideoPlayer()
+                  : const SizedBox(
+                      height: 200,
+                      child: Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
+          if (controller!.value.isInitialized)
+            Positioned.fill(
+              child: BasicOverlayWidget(
+                  controller: controller!,
+                  videoList: widget.videoList,
+                  onResolutionChanged: (val) {
+                    _getValuesAndPlay(val['link'], true);
+                  },
+                  onNextPress: (val) {
+                    globalLogger.d("Next Call $val and controller index ${controller!.currentIndex}");
+                    if (widget.onNextPress != null) widget.onNextPress!(val);
 
-                  if (val != currentIndex) {
-                    currentIndex = val;
-                    setState(() {});
-                    _newPlay();
-                  }
-                },
-                onPreviousPress: (val) {
-                  globalLogger.d("Previous Call $val");
-                  if (widget.onPreviousPress != null) widget.onPreviousPress!(val);
-                  if (val != currentIndex) {
-                    currentIndex = val;
-                    setState(() {});
-                    _newPlay();
-                  }
-                }),
-          ),
+                    if (val != currentIndex) {
+                      currentIndex = val;
+                      setState(() {});
+                      _newPlay();
+                    }
+                  },
+                  onPreviousPress: (val) {
+                    globalLogger.d("Previous Call $val");
+                    if (widget.onPreviousPress != null) widget.onPreviousPress!(val);
+                    if (val != currentIndex) {
+                      currentIndex = val;
+                      setState(() {});
+                      _newPlay();
+                    }
+                  }),
+            ),
         ],
       );
 
