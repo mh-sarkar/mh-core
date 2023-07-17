@@ -8,8 +8,8 @@ import 'package:mh_core/widgets/button/custom_button.dart';
 enum HttpMethod { get, post, put, patch, del, multipartFilePost }
 
 enum HttpPurpose { restAPI, webScraping }
-String stringifyCookies(Map<String, String> cookies) =>
-    cookies.entries.map((e) => '${e.key}=${e.value}').join('; ');
+
+String stringifyCookies(Map<String, String> cookies) => cookies.entries.map((e) => '${e.key}=${e.value}').join('; ');
 
 class ServiceAPI {
   static domain(String path) => _url = path;
@@ -92,36 +92,32 @@ class ServiceAPI {
     bool isErrorHandleButtonExists = false,
     bool needCookie = false,
     bool needJsonContentType = true,
+    bool needJsonAccept = true,
     String? errorButtonLabel,
     Function()? errorButtonPressed,
     Function()? onInternetError,
   }) async {
     try {
       final authHeader = {
-        if(needJsonContentType)
-        'Content-Type':
-        'application/json; charset=UTF-8',
+        if (needJsonContentType) 'Content-Type': 'application/json; charset=UTF-8',
+        if (needJsonAccept) 'Accept': 'application/json',
         'Authorization': '$_authTokenPrefix $_authToken',
-        if(needCookie)
-        'Cookie':  _setCookie.replaceAll(";", "; "),
+        if (needCookie) 'Cookie': _setCookie.replaceAll(";", "; "),
       };
       globalLogger.d('$_authTokenPrefix $_authToken');
       final urlL = Uri.parse(url);
       dynamic response;
       if (httpMethod == HttpMethod.multipartFilePost) {
         var request = http.MultipartRequest("POST", urlL);
-        request.headers.addAll(noNeedAuthToken
-            ? headers ?? {}
-            : authHeader);
+        request.headers.addAll(noNeedAuthToken ? headers ?? {} : authHeader);
         if (allInfoField != null) {
           request.fields.addAll(allInfoField);
         }
 
         if (imageListWithKeyValue != null) {
           for (int i = 0; i < imageListWithKeyValue.length; i++) {
-            request.files.add(await http.MultipartFile.fromPath(
-                imageListWithKeyValue[i]['key'],
-                imageListWithKeyValue[i]['value']));
+            request.files.add(
+                await http.MultipartFile.fromPath(imageListWithKeyValue[i]['key'], imageListWithKeyValue[i]['value']));
           }
         }
 
@@ -130,8 +126,7 @@ class ServiceAPI {
             if (multipleImageListWithKeyValue[i]['key'] != null) {
               List<http.MultipartFile> files = [];
               for (String path in multipleImageListWithKeyValue[i]['key']) {
-                var f = await http.MultipartFile.fromPath(
-                    multipleImageListWithKeyValue[i]['key'], path);
+                var f = await http.MultipartFile.fromPath(multipleImageListWithKeyValue[i]['key'], path);
                 files.add(f);
               }
               request.files.addAll(files);
@@ -144,12 +139,8 @@ class ServiceAPI {
         response = await http.Response.fromStream(res);
       } else {
         response = (httpMethod == HttpMethod.get
-            ? await http
-                .get(urlL,
-                    headers: noNeedAuthToken
-                        ? headers
-                        : authHeader)
-                .timeout(const Duration(seconds: 20), onTimeout: () {
+            ? await http.get(urlL, headers: noNeedAuthToken ? headers : authHeader).timeout(const Duration(seconds: 20),
+                onTimeout: () {
                 return http.Response('Token Error', 500);
               }).catchError((e) {
                 globalLogger.e(e.toString());
@@ -157,12 +148,7 @@ class ServiceAPI {
               })
             : httpMethod == HttpMethod.post
                 ? await http
-                    .post(urlL,
-                        headers: noNeedAuthToken
-                            ? headers
-                            : authHeader,
-                        body: body,
-                        encoding: encoding)
+                    .post(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding)
                     .timeout(const Duration(seconds: 20), onTimeout: () {
                     return http.Response('Token Error', 500);
                   }).catchError((e) {
@@ -171,12 +157,7 @@ class ServiceAPI {
                   })
                 : httpMethod == HttpMethod.put
                     ? await http
-                        .put(urlL,
-                            headers: noNeedAuthToken
-                                ? headers
-                                : authHeader,
-                            body: body,
-                            encoding: encoding)
+                        .put(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding)
                         .timeout(const Duration(seconds: 20), onTimeout: () {
                         return http.Response('Token Error', 500);
                       }).catchError((e) {
@@ -186,28 +167,34 @@ class ServiceAPI {
                     : httpMethod == HttpMethod.patch
                         ? await http
                             .patch(urlL,
-                                headers: noNeedAuthToken
-                                    ? headers
-                                    : authHeader,
-                                body: body,
-                                encoding: encoding)
-                            .timeout(const Duration(seconds: 20),
-                                onTimeout: () {
+                                headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding)
+                            .timeout(const Duration(seconds: 20), onTimeout: () {
                             return http.Response('Token Error', 500);
                           }).catchError((e) {
                             globalLogger.e(e.toString());
                             return http.Response('Token Error', 500);
                           })
                         : await http.delete(urlL,
-                            headers: noNeedAuthToken
-                                ? headers
-                                : authHeader,
-                            body: body,
-                            encoding: encoding));
+                            headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding));
       }
       globalLogger.d(response.body);
-      if((response as http.Response).headers['set-cookie']!=null) {
-        _setCookie =(response as http.Response).headers['set-cookie']!.toString().split(";").where((e) => e.contains('csrftoken') || e.contains('sessionid') ).toList().map((e) => e.contains('csrftoken')?e+";":e.contains("sessionid")?e.substring(e.indexOf("sessionid")):'').toList().toString().replaceAll("[", "").replaceAll("]", "").replaceAll(", ", "");
+      if ((response as http.Response).headers['set-cookie'] != null) {
+        _setCookie = (response as http.Response)
+            .headers['set-cookie']!
+            .toString()
+            .split(";")
+            .where((e) => e.contains('csrftoken') || e.contains('sessionid'))
+            .toList()
+            .map((e) => e.contains('csrftoken')
+                ? e + ";"
+                : e.contains("sessionid")
+                    ? e.substring(e.indexOf("sessionid"))
+                    : '')
+            .toList()
+            .toString()
+            .replaceAll("[", "")
+            .replaceAll("]", "")
+            .replaceAll(", ", "");
         globalLogger.d(_setCookie, "_setCookie");
       }
       globalLogger.d(response.statusCode);
@@ -217,14 +204,16 @@ class ServiceAPI {
       if (is401Call) {
         is401Call = false;
       }
-      // Get.closeAllSnackbars();
-      // snackbarKey!.currentState?.clearSnackBars();
-      if (response.statusCode == 200 || response.statusCode == 201) {
 
+      if (response.statusCode != 500 && is500Call) {
+        is500Call = false;
+        snackbarKey!.currentState?.clearSnackBars();
+      }
+      // Get.closeAllSnackbars();
+      if (response.statusCode == 200 || response.statusCode == 201) {
         if (httpPurpose == HttpPurpose.webScraping) return response.body;
         return jsonDecode(response.body);
-      } else if(defaultErrorMsgShow) {
-
+      } else if (defaultErrorMsgShow) {
         if (response.statusCode == 400) {
           showAlert("The request was invalid!");
         } else if (response.statusCode == 401) {
@@ -241,8 +230,7 @@ class ServiceAPI {
                     : null);
           }
         } else if (response.statusCode == 403) {
-          showAlert(
-              "You do not have enough permissions to perform this action!");
+          showAlert("You do not have enough permissions to perform this action!");
         } else if (response.statusCode == 404) {
           showAlert("The requested resource not found!");
         } else if (response.statusCode == 405) {
@@ -252,9 +240,9 @@ class ServiceAPI {
         } else if (response.statusCode == 429) {
           showAlert("Server is busy now!");
         } else if (response.statusCode == 500) {
+          is500Call = true;
           isErrorHandleButtonExists
-              ? showAlert(
-                  "The request was not completed due to an internal error on the server side!",
+              ? showAlert("The request was not completed due to an internal error on the server side!",
                   errorHandleButton: isErrorHandleButtonExists
                       ? CustomButton(
                           primary: Colors.red,
@@ -271,7 +259,6 @@ class ServiceAPI {
         }
       }
       return jsonDecode(response.body);
-
     } catch (e) {
       globalLogger.e(e);
       return {};

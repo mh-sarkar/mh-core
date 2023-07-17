@@ -131,14 +131,33 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   }
 
   @override
-  Widget build(BuildContext context) => widget.controller.value.isInitialized
-      ? Container(alignment: Alignment.topCenter, child: buildVideo())
-      : const SizedBox(
+  Widget build(BuildContext context) => widget.videoList![currentIndex].isEmpty
+      ? Container(
           height: 200,
-          child: Center(
-            child: CircularProgressIndicator(),
+          color: Colors.black12,
+          child: const Center(
+            child: Text('Couldn\'t play this video'),
           ),
-        );
+        )
+      : widget.controller.value.isInitialized
+          ? Container(alignment: Alignment.topCenter, child: buildVideo())
+          : widget.controller.value.hasError
+              ? Container(
+                  height: 200,
+                  color: Colors.black12,
+                  child: const Center(
+                    child: Text(
+                      'Couldn\'t play this video.\nMay be this video url is broken,\nnot completed or not supported!',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                )
+              : const SizedBox(
+                  height: 200,
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
 
   Widget buildVideo() => Stack(
         fit: MediaQuery.of(context).orientation == Orientation.portrait ? StackFit.loose : StackFit.expand,
@@ -187,6 +206,7 @@ class VideoPlayerWidgetV2 extends StatefulWidget {
     this.onNextPress,
     this.onPreviousPress,
     this.listenPosition,
+    this.currentIndex,
   }) : super(key: key);
 
   // final VideoPlayerController controller;
@@ -195,6 +215,7 @@ class VideoPlayerWidgetV2 extends StatefulWidget {
   final Function(int)? onNextPress;
   final Function(int)? onPreviousPress;
   final Function(int)? listenPosition;
+  final int? currentIndex;
 
   @override
   State<VideoPlayerWidgetV2> createState() => _VideoPlayerWidgetV2State();
@@ -270,6 +291,24 @@ class _VideoPlayerWidgetV2State extends State<VideoPlayerWidgetV2> {
           _getValuesAndPlay(value[0]['link'], isPlay),
           resVideo = value,
         });
+  }
+
+  changeIndexFromUser() {
+    globalLogger.d("From User ${widget.currentIndex}");
+
+    if (widget.currentIndex != -1) {
+      currentIndex = widget.currentIndex!;
+      setState(() {});
+      _newPlay();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant VideoPlayerWidgetV2 oldWidget) {
+    // If you want to react only to changes you could check
+    // oldWidget.selectedIndex != widget.selectedIndex
+    changeIndexFromUser();
+    super.didUpdateWidget(oldWidget);
   }
 
   Future<bool> _clearPrevious() async {
@@ -364,12 +403,23 @@ class _VideoPlayerWidgetV2State extends State<VideoPlayerWidgetV2> {
                 )
               : controller!.value.isInitialized
                   ? buildVideoPlayer()
-                  : const SizedBox(
-                      height: 200,
-                      child: Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    ),
+                  : controller!.value.hasError
+                      ? Container(
+                          height: 200,
+                          color: Colors.black12,
+                          child: const Center(
+                            child: Text(
+                              'Couldn\'t play this video.\nMay be this video url is broken,\nnot completed or not supported!',
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        )
+                      : const SizedBox(
+                          height: 200,
+                          child: Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
           if (controller!.value.isInitialized)
             Positioned.fill(
               child: BasicOverlayWidget(
@@ -381,7 +431,6 @@ class _VideoPlayerWidgetV2State extends State<VideoPlayerWidgetV2> {
                   onNextPress: (val) {
                     globalLogger.d("Next Call $val and controller index ${controller!.currentIndex}");
                     if (widget.onNextPress != null) widget.onNextPress!(val);
-
                     if (val != currentIndex) {
                       currentIndex = val;
                       setState(() {});
