@@ -26,3 +26,34 @@ void onInternet({Function()? onRetry}) {
     ),
   );
 }
+
+showSnackBar({
+  required String msg,
+  String? actionLabel,
+  Function()? actionPressed,
+  Color? bgColor,
+  Color? msgColor,
+  Color? actionLabelColor,
+}) {
+  globalLogger.d("jj");
+  snackbarKey!.currentState?.showSnackBar(
+    SnackBar(
+      dismissDirection: DismissDirection.down,
+      content: Text(
+        msg,
+        style: TextStyle(color: msgColor),
+      ),
+      backgroundColor: bgColor ?? Colors.black,
+      action: SnackBarAction(
+        label: actionLabel ?? 'CLOSE',
+        textColor: actionLabelColor ?? Colors.blue,
+        onPressed: () {
+          snackbarKey!.currentState?.removeCurrentSnackBar();
+          if (actionPressed != null) {
+            actionPressed;
+          }
+        },
+      ),
+    ),
+  );
+}
