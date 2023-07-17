@@ -122,6 +122,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   void dispose() {
     // TODO: implement dispose
     _initializeVideoPlayerFuture = null;
+    globalLogger.d("Player Disposed 2");
 
     widget.controller.pause().then((_) {
       widget.controller.removeListener(listener);
@@ -353,6 +354,8 @@ class _VideoPlayerWidgetV2State extends State<VideoPlayerWidgetV2> {
   void dispose() {
     // TODO: implement dispose
     _initializeVideoPlayerFuture = null;
+
+    globalLogger.d("Player Disposed 1");
 
     controller!.pause().then((_) {
       controller!.setVolume(0.0);

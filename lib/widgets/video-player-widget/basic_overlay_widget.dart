@@ -290,6 +290,27 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
           behavior: HitTestBehavior.opaque,
           onTap: () {
             setState(() {
+              buildBottomSheetSpeed();
+            });
+          },
+          child:   SizedBox(
+            height: 30,
+            width: 30,
+            // decoration: BoxDecoration(
+            //   color: Colors.white,
+            //   borderRadius: BorderRadius.circular(3),
+            //
+            // ),
+            child: Center(
+              child: Text("X${widget.controller.value.playbackSpeed}", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),),
+            ),
+          ),
+        ),
+        space1R,
+        GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            setState(() {
               buildBottomSheet();
             });
           },
@@ -360,6 +381,7 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
                 MaterialPageRoute(
                     builder: (context) => LandscapeVideo(
                           controller: widget.controller,
+                      videoList: widget.videoList!,
                         ),),
               );
             } else {
@@ -547,6 +569,89 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
       },
     );
   }
+  void buildBottomSheetSpeed() {
+    showModalBottomSheet(
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(10),
+          topRight: Radius.circular(10),
+        ),
+      ),
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) => Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              space2C,
+              Container(
+                height: 5,
+                width: 60,
+                color: Colors.grey.withOpacity(.40),
+              ),
+              space4C,
+              if (MediaQuery.of(context).orientation == Orientation.landscape)
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: List.generate(["X0.5","X1.0","X1.5","X2.0"].length, (index) {
+                        return GestureDetector(
+                          onTap: () {
+                            // setState(() {
+                            //   regulationSelectedIndex = index;
+                            // });
+                            if ("X${widget.controller.value.playbackSpeed}" != ["X0.5","X1.0","X1.5","X2.0"][index]) {
+
+                              widget.controller.setPlaybackSpeed(double.parse(["X0.5","X1.0","X1.5","X2.0"][index].substring(1)));
+                              // widget.onResolutionChanged(widget.controller.currentPlay[index]);
+                            }
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            color: Colors.white,
+                            child: buildRegulationItemSpeed(
+                              title: ["X0.5","X1.0","X1.5","X2.0"][index],
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
+                  ),
+                ),
+              if (!(MediaQuery.of(context).orientation == Orientation.landscape))
+                Column(
+                  children: List.generate(["X0.5","X1.0","X1.5","X2.0"].length, (index) {
+                    return GestureDetector(
+                      onTap: () {
+                        // setState(() {
+                        //   regulationSelectedIndex = index;
+                        // });
+                        if ("X${widget.controller.value.playbackSpeed}" != ["X0.5","X1.0","X1.5","X2.0"][index]) {
+
+                          widget.controller.setPlaybackSpeed(double.parse(["X0.5","X1.0","X1.5","X2.0"][index].substring(1)));
+                          setState((){
+
+                          });
+                          // widget.onResolutionChanged(widget.controller.currentPlay[index]);
+                        }
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        color: Colors.white,
+                        child: buildRegulationItemSpeed(
+                          title: ["X0.5","X1.0","X1.5","X2.0"][index],
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   Widget buildRegulationItem({required String title, required int index}) {
     return Column(
@@ -570,6 +675,38 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
                         fontSize: 14,
                         color: Colors.black,
                       ),
+              ),
+            ],
+          ),
+        ),
+        const MyDivider(height: .5),
+      ],
+    );
+  }
+
+
+  Widget buildRegulationItemSpeed({required String title}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: Row(
+            children: [
+              Text(
+                title,
+                style:"X${widget.controller.value.playbackSpeed}" == title
+                    ? TextStyle(
+                  color: CustomColor.kPrimaryColor,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                )
+                    : const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                  color: Colors.black,
+                ),
               ),
             ],
           ),

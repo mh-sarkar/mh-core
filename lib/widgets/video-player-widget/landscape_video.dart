@@ -5,9 +5,9 @@ import 'package:mh_core/widgets/video-player-widget/video_player_widget.dart';
 import 'package:video_player/video_player.dart';
 
 class LandscapeVideo extends StatefulWidget {
-  const LandscapeVideo({Key? key,  this.controller}) : super(key: key);
+  const LandscapeVideo({Key? key,  this.controller, this.videoList}) : super(key: key);
 final MhVideoController? controller;
-
+  final List<String>? videoList;
   @override
   State<LandscapeVideo> createState() => _LandscapeVideoState();
 }
@@ -37,6 +37,7 @@ class _LandscapeVideoState extends State<LandscapeVideo> {
             width: MediaQuery.of(context).size.width,
             child: VideoPlayerWidget(
               controller: widget.controller!,
+              videoList: widget.videoList!,
             ),
           ),
         ),
