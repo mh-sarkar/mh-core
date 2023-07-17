@@ -218,7 +218,7 @@ class ServiceAPI {
         is401Call = false;
       }
       // Get.closeAllSnackbars();
-      snackbarKey!.currentState?.clearSnackBars();
+      // snackbarKey!.currentState?.clearSnackBars();
       if (response.statusCode == 200 || response.statusCode == 201) {
 
         if (httpPurpose == HttpPurpose.webScraping) return response.body;
