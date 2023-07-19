@@ -44,7 +44,7 @@ showSnackBar({
   snackbarKey!.currentState?.showSnackBar(
     SnackBar(
       duration: duration?? const Duration(seconds: 4) ,
-
+      behavior: SnackBarBehavior.floating,
       dismissDirection:dismissDirection?? DismissDirection.down,
       content: Text(
         msg,
