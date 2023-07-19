@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -94,155 +95,165 @@ class ServiceAPI {
     bool needJsonContentType = true,
     bool needJsonAccept = true,
     String? errorButtonLabel,
+    String? loadingMessage,
     Function()? errorButtonPressed,
     Function()? onInternetError,
   }) async {
     try {
-      final authHeader = {
-        if (needJsonContentType) 'Content-Type': 'application/json; charset=UTF-8',
-        if (needJsonAccept) 'Accept': 'application/json',
-        'Authorization': '$_authTokenPrefix $_authToken',
-        if (needCookie) 'Cookie': _setCookie.replaceAll(";", "; "),
-      };
-      globalLogger.d('$_authTokenPrefix $_authToken');
-      final urlL = Uri.parse(url);
-      dynamic response;
-      if (httpMethod == HttpMethod.multipartFilePost) {
-        var request = http.MultipartRequest("POST", urlL);
-        request.headers.addAll(noNeedAuthToken ? headers ?? {} : authHeader);
-        if (allInfoField != null) {
-          request.fields.addAll(allInfoField);
+      final result = await InternetAddress.lookup('example.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        globalLogger.d(result.map((e) => e.toString()).toList());
+        // showSnackBar(msg: 'connected');
+        if (is500Call) {
+          is500Call = false;
+          snackbarKey!.currentState?.clearSnackBars();
         }
-
-        if (imageListWithKeyValue != null) {
-          for (int i = 0; i < imageListWithKeyValue.length; i++) {
-            request.files.add(
-                await http.MultipartFile.fromPath(imageListWithKeyValue[i]['key'], imageListWithKeyValue[i]['value']));
-          }
+        if (isLoadingEnable) {
+          showProgressDialog(loadingMessage);
         }
-
-        if (multipleImageListWithKeyValue != null) {
-          for (int i = 0; i < multipleImageListWithKeyValue.length; i++) {
-            if (multipleImageListWithKeyValue[i]['key'] != null) {
-              List<http.MultipartFile> files = [];
-              for (String path in multipleImageListWithKeyValue[i]['key']) {
-                var f = await http.MultipartFile.fromPath(multipleImageListWithKeyValue[i]['key'], path);
-                files.add(f);
-              }
-              request.files.addAll(files);
-              globalLogger.d(multipleImageListWithKeyValue[i]['key']);
+        try {
+          final authHeader = {
+            if (needJsonContentType) 'Content-Type': 'application/json; charset=UTF-8',
+            if (needJsonAccept) 'Accept': 'application/json',
+            'Authorization': '$_authTokenPrefix $_authToken',
+            if (needCookie) 'Cookie': _setCookie.replaceAll(";", "; "),
+          };
+          globalLogger.d('$_authTokenPrefix $_authToken');
+          final urlL = Uri.parse(url);
+          dynamic response;
+          if (httpMethod == HttpMethod.multipartFilePost) {
+            var request = http.MultipartRequest("POST", urlL);
+            request.headers.addAll(noNeedAuthToken ? headers ?? {} : authHeader);
+            if (allInfoField != null) {
+              request.fields.addAll(allInfoField);
             }
-          }
-        }
 
-        final res = await request.send();
-        response = await http.Response.fromStream(res);
-      } else {
-        response = (httpMethod == HttpMethod.get
-            ? await http.get(urlL, headers: noNeedAuthToken ? headers : authHeader).timeout(const Duration(seconds: 20),
-                onTimeout: () {
-                return http.Response('Token Error', 500);
-              }).catchError((e) {
-                globalLogger.e(e.toString());
-                return http.Response('Token Error', 500);
-              })
-            : httpMethod == HttpMethod.post
+            if (imageListWithKeyValue != null) {
+              for (int i = 0; i < imageListWithKeyValue.length; i++) {
+                request.files.add(await http.MultipartFile.fromPath(
+                    imageListWithKeyValue[i]['key'], imageListWithKeyValue[i]['value']));
+              }
+            }
+
+            if (multipleImageListWithKeyValue != null) {
+              for (int i = 0; i < multipleImageListWithKeyValue.length; i++) {
+                if (multipleImageListWithKeyValue[i]['key'] != null) {
+                  List<http.MultipartFile> files = [];
+                  for (String path in multipleImageListWithKeyValue[i]['key']) {
+                    var f = await http.MultipartFile.fromPath(multipleImageListWithKeyValue[i]['key'], path);
+                    files.add(f);
+                  }
+                  request.files.addAll(files);
+                  globalLogger.d(multipleImageListWithKeyValue[i]['key']);
+                }
+              }
+            }
+
+            final res = await request.send();
+            response = await http.Response.fromStream(res);
+          } else {
+            response = (httpMethod == HttpMethod.get
                 ? await http
-                    .post(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding)
+                    .get(urlL, headers: noNeedAuthToken ? headers : authHeader)
                     .timeout(const Duration(seconds: 20), onTimeout: () {
                     return http.Response('Token Error', 500);
                   }).catchError((e) {
                     globalLogger.e(e.toString());
                     return http.Response('Token Error', 500);
                   })
-                : httpMethod == HttpMethod.put
+                : httpMethod == HttpMethod.post
                     ? await http
-                        .put(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding)
+                        .post(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding)
                         .timeout(const Duration(seconds: 20), onTimeout: () {
                         return http.Response('Token Error', 500);
                       }).catchError((e) {
                         globalLogger.e(e.toString());
                         return http.Response('Token Error', 500);
                       })
-                    : httpMethod == HttpMethod.patch
+                    : httpMethod == HttpMethod.put
                         ? await http
-                            .patch(urlL,
-                                headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding)
+                            .put(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding)
                             .timeout(const Duration(seconds: 20), onTimeout: () {
                             return http.Response('Token Error', 500);
                           }).catchError((e) {
                             globalLogger.e(e.toString());
                             return http.Response('Token Error', 500);
                           })
-                        : await http.delete(urlL,
-                            headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding));
-      }
-      globalLogger.d(response.body);
-      if ((response as http.Response).headers['set-cookie'] != null) {
-        _setCookie = (response as http.Response)
-            .headers['set-cookie']!
-            .toString()
-            .split(";")
-            .where((e) => e.contains('csrftoken') || e.contains('sessionid'))
-            .toList()
-            .map((e) => e.contains('csrftoken')
-                ? e + ";"
-                : e.contains("sessionid")
-                    ? e.substring(e.indexOf("sessionid"))
-                    : '')
-            .toList()
-            .toString()
-            .replaceAll("[", "")
-            .replaceAll("]", "")
-            .replaceAll(", ", "");
-        globalLogger.d(_setCookie, "_setCookie");
-      }
-      globalLogger.d(response.statusCode);
-      if (isLoadingEnable) {
-        navigatorKey!.currentState!.pop();
-      }
-      if (is401Call) {
-        is401Call = false;
-      }
-
-      if (response.statusCode != 500 && is500Call) {
-        is500Call = false;
-        snackbarKey!.currentState?.clearSnackBars();
-      }
-      // Get.closeAllSnackbars();
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        if (httpPurpose == HttpPurpose.webScraping) return response.body;
-        return jsonDecode(response.body);
-      } else if (defaultErrorMsgShow) {
-        if (response.statusCode == 400) {
-          showAlert("The request was invalid!");
-        } else if (response.statusCode == 401) {
-          if (!is401Call) {
-            is401Call = true;
-            showAlert("Invalid login credentials!",
-                errorHandleButton: isErrorHandleButtonExists
-                    ? CustomButton(
-                        primary: Colors.red,
-                        label: errorButtonLabel!,
-                        onPressed: errorButtonPressed,
-                        marginVertical: 8,
-                      )
-                    : null);
+                        : httpMethod == HttpMethod.patch
+                            ? await http
+                                .patch(urlL,
+                                    headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding)
+                                .timeout(const Duration(seconds: 20), onTimeout: () {
+                                return http.Response('Token Error', 500);
+                              }).catchError((e) {
+                                globalLogger.e(e.toString());
+                                return http.Response('Token Error', 500);
+                              })
+                            : await http.delete(urlL,
+                                headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding));
           }
-        } else if (response.statusCode == 403) {
-          showAlert("You do not have enough permissions to perform this action!");
-        } else if (response.statusCode == 404) {
-          showAlert("The requested resource not found!");
-        } else if (response.statusCode == 405) {
-          showAlert("This request is not supported by the resource!");
-        } else if (response.statusCode == 409) {
-          showAlert("The request could not be completed due to a conflict!");
-        } else if (response.statusCode == 429) {
-          showAlert("Server is busy now!");
-        } else if (response.statusCode == 500) {
-          is500Call = true;
-          isErrorHandleButtonExists
-              ? showAlert("The request was not completed due to an internal error on the server side!",
+          globalLogger.d(response.body);
+          if ((response as http.Response).headers['set-cookie'] != null) {
+            _setCookie = (response as http.Response)
+                .headers['set-cookie']!
+                .toString()
+                .split(";")
+                .where((e) => e.contains('csrftoken') || e.contains('sessionid'))
+                .toList()
+                .map((e) => e.contains('csrftoken')
+                    ? e + ";"
+                    : e.contains("sessionid")
+                        ? e.substring(e.indexOf("sessionid"))
+                        : '')
+                .toList()
+                .toString()
+                .replaceAll("[", "")
+                .replaceAll("]", "")
+                .replaceAll(", ", "");
+            globalLogger.d(_setCookie, "_setCookie");
+          }
+          globalLogger.d(response.statusCode);
+          if (isLoadingEnable) {
+            navigatorKey!.currentState!.pop();
+          }
+          if (is401Call) {
+            is401Call = false;
+          }
+
+          // Get.closeAllSnackbars();
+          if (response.statusCode == 200 || response.statusCode == 201) {
+            if (httpPurpose == HttpPurpose.webScraping) return response.body;
+            return jsonDecode(response.body);
+          } else if (defaultErrorMsgShow) {
+            if (response.statusCode == 400) {
+              showAlert("The request was invalid!");
+            } else if (response.statusCode == 401) {
+              if (!is401Call) {
+                is401Call = true;
+                showAlert("Invalid login credentials!",
+                    errorHandleButton: isErrorHandleButtonExists
+                        ? CustomButton(
+                            primary: Colors.red,
+                            label: errorButtonLabel!,
+                            onPressed: errorButtonPressed,
+                            marginVertical: 8,
+                          )
+                        : null);
+              }
+            } else if (response.statusCode == 403) {
+              showAlert("You do not have enough permissions to perform this action!");
+            } else if (response.statusCode == 404) {
+              showAlert("The requested resource not found!");
+            } else if (response.statusCode == 405) {
+              showAlert("This request is not supported by the resource!");
+            } else if (response.statusCode == 409) {
+              showAlert("The request could not be completed due to a conflict!");
+            } else if (response.statusCode == 429) {
+              showAlert("Server is busy now!");
+            } else if (response.statusCode == 500) {
+              // isErrorHandleButtonExists
+              //     ?
+              showAlert("The request was not completed due to an internal error on the server side!",
                   errorHandleButton: isErrorHandleButtonExists
                       ? CustomButton(
                           primary: Colors.red,
@@ -250,18 +261,26 @@ class ServiceAPI {
                           onPressed: errorButtonPressed,
                           marginVertical: 8,
                         )
-                      : null)
-              : onInternet(onRetry: onInternetError);
-        } else if (response.statusCode == 503) {
-          showAlert("The server was unavailable!");
-        } else {
-          showAlert("Something went wrong!");
+                      : null);
+            } else if (response.statusCode == 503) {
+              showAlert("The server was unavailable!");
+            } else {
+              showAlert("Something went wrong!");
+            }
+          }
+          return jsonDecode(response.body);
+        } catch (e) {
+          globalLogger.e(e);
+          return {};
         }
       }
-      return jsonDecode(response.body);
-    } catch (e) {
-      globalLogger.e(e);
-      return {};
+    } on SocketException catch (_) {
+      if (!is500Call) {
+        onInternet(onRetry: onInternetError);
+        is500Call = true;
+      }
+      // showSnackBar(msg: 'not connected');
+      // print('not connected');
     }
   }
 
@@ -285,6 +304,22 @@ class ServiceAPI {
           ),
           if (errorHandleButton != null) errorHandleButton,
         ],
+      ),
+    );
+  }
+
+  ///Alert Dialog
+  static void showProgressDialog(String? msg, {Widget? errorHandleButton}) {
+    showDialog(
+      context: navigatorKey!.currentContext!,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title:  Text(msg ?? 'Please Wait'),
+        content: const Center(
+          child: CircularProgressIndicator(
+            color: Colors.black,
+          ),
+        ),
       ),
     );
   }

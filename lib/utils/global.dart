@@ -13,7 +13,7 @@ void onInternet({Function()? onRetry}) {
     SnackBar(
       dismissDirection: DismissDirection.down,
       duration: const Duration(minutes: 5),
-      content: const Text('Your Device has no internet connection!', style: TextStyle(color:Colors.red),),
+      content: const Text('Your Device has no internet connection!', style: TextStyle(color:Colors.white),),
       backgroundColor:Colors.black,
       action: SnackBarAction(
         label: 'Retry',
