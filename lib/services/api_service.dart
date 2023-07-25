@@ -314,10 +314,20 @@ class ServiceAPI {
       context: navigatorKey!.currentContext!,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title:  Text(msg ?? 'Please Wait'),
-        content: const Center(
-          child: CircularProgressIndicator(
-            color: Colors.black,
+        contentPadding: EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 20, top: 16),
+        shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        title: Text(
+          msg ?? 'Please Wait',
+          textAlign: TextAlign.center,
+        ),
+         titlePadding: EdgeInsets.only(top: 16),
+         content: const SizedBox(
+          width: 40,
+          height: 40,
+          child: Center(
+            child: CircularProgressIndicator(
+              color: Colors.black,
+            ),
           ),
         ),
       ),
