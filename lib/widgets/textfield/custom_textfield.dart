@@ -42,6 +42,7 @@ class CustomTextField extends StatefulWidget {
   final double? marginLeft;
   final double? marginRight;
   final double? marginBottom;
+  final double? borderWidth;
 
   const CustomTextField({
     Key? key,
@@ -82,7 +83,7 @@ class CustomTextField extends StatefulWidget {
     this.marginTop,
     this.marginLeft,
     this.marginRight,
-    this.marginBottom,
+    this.marginBottom, this.borderWidth,
   }) : super(key: key);
 
   @override
@@ -174,7 +175,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                             borderSide: BorderSide(
                               color:
                                   widget.focusColor ?? const Color(0xffD9D9D9),
-                              width: 1,
+                              width:widget.borderWidth?? 1,
                             ),
                           ),
                           enabledBorder: OutlineInputBorder(
@@ -183,7 +184,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                             borderSide: BorderSide(
                               color: widget.enableBorderColor ??
                                   const Color(0xffD9D9D9),
-                              width: 1,
+                              width:widget.borderWidth?? 1,
                             ),
                           ),
                           labelText:

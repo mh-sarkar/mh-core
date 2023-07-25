@@ -27,6 +27,8 @@ class CustomButton extends StatelessWidget {
     this.isDisable = false,
     this.prefixImage,
     this.suffixImage,
+    this.prefixImageHeight,
+    this.prefixImageWidth, this.prefixImageColor,
   }) : super(key: key);
   final String label;
   final Function()? onPressed;
@@ -51,6 +53,9 @@ class CustomButton extends StatelessWidget {
   final bool isBorder;
   final String? prefixImage;
   final String? suffixImage;
+  final double? prefixImageHeight;
+  final double? prefixImageWidth;
+  final Color? prefixImageColor;
 
   @override
   Widget build(BuildContext context) {
@@ -81,14 +86,22 @@ class CustomButton extends StatelessWidget {
               horizontal: contentHorizontalPadding ?? contentPadding ?? 8,
               vertical: contentVerticalPadding ?? contentPadding ?? 8),
           shape: RoundedRectangleBorder(
-            side: isBorder ? const BorderSide(color: Colors.black, width: 1) : BorderSide.none,
+            side: isBorder
+                ? BorderSide(color: borderColor ?? Colors.black, width: 1)
+                : BorderSide.none,
             borderRadius: BorderRadius.circular(borderRadiusAll ?? 4),
           ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (prefixImage != null) Image.asset(prefixImage!),
+            if (prefixImage != null)
+              Image.asset(
+                prefixImage!,
+                width: prefixImageWidth,
+                height: prefixImageHeight,
+                color: prefixImageColor,
+              ),
             if (prefixImage != null) const SizedBox(width: 8),
             Text(label,
                 style: TextStyle(
