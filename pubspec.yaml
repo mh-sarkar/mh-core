@@ -29,6 +29,16 @@ dependencies:
   #Use for html parse
   html: ^0.15.3
 
+  #Use for pick image from gallery or camera
+  image_picker: ^0.8.5+3
+  image: ^4.0.17
+
+  #Use for file pick
+  file_picker: ^5.2.6
+
+  #Use for webpage view in app
+  webview_flutter: ^4.0.2
+
   #####################Dev Tools#####################
 
   #For Development Purpose ///working like print
