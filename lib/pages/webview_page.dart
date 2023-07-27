@@ -10,8 +10,8 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart' as webview_flutter_android;
 
 class WebViewPage extends StatefulWidget {
-  const WebViewPage({Key? key}) : super(key: key);
-  static String routeName = '/WebViewPage';
+  const WebViewPage({Key? key, required this.url}) : super(key: key);
+  final String url;
 
   @override
   State<WebViewPage> createState() => _WebViewPageState();
@@ -47,7 +47,7 @@ class _WebViewPageState extends State<WebViewPage> {
           },
         ),
       )
-      ..loadRequest(Uri.parse(ModalRoute.of(context)!.settings.arguments!.toString()));
+      ..loadRequest(Uri.parse(widget.url));
 
     initFilePicker();
     super.initState();
@@ -89,18 +89,19 @@ class _WebViewPageState extends State<WebViewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: isLoading
+        body: SafeArea(
+      child: isLoading
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : Expanded(
-              child: WebViewWidget(
-                controller: _controller!,
-              ),
+          : WebViewWidget(
+              controller: _controller!,
             ),
-      // const SizedBox(
-      //   height: 110,
-      // ),
-    );
+    )
+
+        // const SizedBox(
+        //   height: 110,
+        // ),
+        );
   }
 }
