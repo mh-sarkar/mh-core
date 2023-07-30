@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mh_core/services/api_service.dart';
+import 'package:mh_core/utils/color/custom_color.dart';
 import 'package:mh_core/utils/image_utils.dart';
 
 /// [isFromAPI] is define your image from api or internet
@@ -135,7 +136,7 @@ class ImagePreview extends StatefulWidget {
       this.title,
       this.titleColor = Colors.black,
       this.isAppBarShow = true,
-      this.appBarColor = Colors.white})
+      this.appBarColor})
       : super(key: key);
 
   @override
@@ -153,7 +154,7 @@ class _ImagePreviewState extends State<ImagePreview> {
               //   color: Colors.black, //change your color here
               // ),
               // automaticallyImplyLeading: false,
-              backgroundColor: widget.appBarColor,
+              backgroundColor: widget.appBarColor ?? CustomColor.kPrimaryColor,
               title: Text(
                 widget.title ?? "Untitled Image",
                 style: TextStyle(
