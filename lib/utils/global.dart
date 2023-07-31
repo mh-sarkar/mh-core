@@ -13,8 +13,11 @@ void onInternet({Function()? onRetry}) {
     SnackBar(
       dismissDirection: DismissDirection.down,
       duration: const Duration(minutes: 5),
-      content: const Text('Your Device has no internet connection!', style: TextStyle(color:Colors.white),),
-      backgroundColor:Colors.black,
+      content: const Text(
+        'Your Device has no internet connection!',
+        style: TextStyle(color: Colors.white),
+      ),
+      backgroundColor: Colors.black,
       action: SnackBarAction(
         label: 'Retry',
         textColor: Colors.blue,
@@ -40,12 +43,11 @@ showSnackBar({
   DismissDirection? dismissDirection,
   Duration? duration,
 }) {
-  globalLogger.d("jj");
   snackbarKey!.currentState?.showSnackBar(
     SnackBar(
-      duration: duration?? const Duration(seconds: 4) ,
+      duration: duration ?? const Duration(seconds: 4),
       behavior: SnackBarBehavior.floating,
-      dismissDirection:dismissDirection?? DismissDirection.down,
+      dismissDirection: dismissDirection ?? DismissDirection.down,
       content: Text(
         msg,
         style: TextStyle(color: msgColor),

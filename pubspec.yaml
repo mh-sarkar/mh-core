@@ -30,7 +30,7 @@ dependencies:
   html: ^0.15.3
 
   #Use for pick image from gallery or camera
-  image_picker: ^0.8.5+3
+  image_picker: ^1.0.1
   image: ^4.0.17
 
   #Use for file pick

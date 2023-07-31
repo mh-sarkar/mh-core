@@ -24,7 +24,7 @@ String percentCalculation(String mainPrice, String percent, [String discountPric
 
 dynamic localizationCheckForNumber(dynamic data) {
   if (data == null) return null;
-  if (locale!=null && locale.toString() == const Locale('bn_BD').toString()) {
+  if (locale != null && locale.toString() == const Locale('bn_BD').toString()) {
     if (data.toString().contains('.00')) {
       return banNumber(data);
     } else if (data.toString().contains('.0')) {
@@ -39,7 +39,8 @@ dynamic localizationCheckForNumber(dynamic data) {
 }
 
 dynamic localizationDateTime(DateTime dateTime, [String dateFormat = 'dd MMM yyyy']) {
-  return DateFormat(dateFormat, locale!=null && locale.toString() == const Locale('bn_BD').toString() ? 'bn' : 'en').format(dateTime);
+  return DateFormat(dateFormat, locale != null && locale.toString() == const Locale('bn_BD').toString() ? 'bn' : 'en')
+      .format(dateTime);
 }
 
 dynamic localizationEngForceFully(dynamic data) {
@@ -172,4 +173,16 @@ dynamic numberEng(String number) {
       break;
   }
   return newNumber;
+}
+
+String getStarNumber(dynamic number) {
+  if (number == null) {
+    return '';
+  } else {
+    int numLength = number.length;
+    String part1 = number.toString().substring(0, numLength - 3 * (numLength / 4).floor());
+    String part2 = number.toString().substring(numLength - (numLength / 4).floor(), numLength);
+
+    return '$part1****$part2';
+  }
 }
