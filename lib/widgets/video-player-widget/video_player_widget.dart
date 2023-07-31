@@ -12,6 +12,7 @@ class VideoPlayerWidget extends StatefulWidget {
     this.videoList,
     this.onNextPress,
     this.onPreviousPress,
+    this.fromLandscape = false,
   }) : super(key: key);
 
   // final VideoPlayerController controller;
@@ -19,6 +20,7 @@ class VideoPlayerWidget extends StatefulWidget {
   List<String>? videoList;
   Function(int)? onNextPress;
   Function(int)? onPreviousPress;
+  final bool fromLandscape;
 
   @override
   State<VideoPlayerWidget> createState() => _VideoPlayerWidgetState();
@@ -33,13 +35,11 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   Duration? newCurrentPosition;
   @override
   void initState() {
-    // globalLogger.d("Eibar AMI Call Holam");
+    if (!widget.fromLandscape) widget.controller.dispose();
 
-    widget.controller.dispose();
-
-    widget.controller.setCurrentIndex(0);
+    if (!widget.fromLandscape) widget.controller.setCurrentIndex(0);
     // globalLogger.d(widget.controller.value, "Controller Value");
-    _newPlay(false);
+    if (!widget.fromLandscape) _newPlay(false);
     listener = () {
       // globalLogger.d("_initializePlay Listener");
       Duration duration = widget.controller.value.duration;
@@ -56,15 +56,11 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
           currentIndex == widget.controller.currentIndex &&
           currentIndex < widget.videoList!.length - 1) {
         widget.controller.setCurrentIndex(currentIndex + 1);
-        // if (currentIndex != widget.controller.currentIndex) {
         widget.controller.pause();
         currentIndex = widget.controller.currentIndex;
         if (mounted) setState(() {});
         widget.onNextPress!(currentIndex);
-        globalLogger.d("Eibar NEW PLAY Call HOLO");
-
         _newPlay();
-        // }
       }
 
       // _playBackTime = widget.controller.value.position.inSeconds;
@@ -125,8 +121,8 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     globalLogger.d("Player Disposed 2");
 
     widget.controller.pause().then((_) {
-      widget.controller.removeListener(listener);
-      widget.controller.dispose();
+      // widget.controller.removeListener(listener);
+      // widget.controller.dispose();
     });
     super.dispose();
   }

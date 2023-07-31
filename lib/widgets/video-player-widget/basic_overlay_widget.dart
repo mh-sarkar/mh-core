@@ -1,14 +1,16 @@
 import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mh_core/utils/color/custom_color.dart';
 import 'package:mh_core/utils/constant.dart';
 import 'package:mh_core/utils/global.dart';
 import 'package:mh_core/widgets/video-player-widget/controller.dart';
+import 'package:perfect_volume_control/perfect_volume_control.dart';
+import 'package:video_player/video_player.dart';
+
 import '../divider/custom_divider.dart';
 import '../video-player-widget/landscape_video.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:video_player/video_player.dart';
-import 'package:perfect_volume_control/perfect_volume_control.dart';
 
 class BasicOverlayWidget extends StatefulWidget {
   BasicOverlayWidget({
@@ -176,7 +178,7 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
                   bottom: 10,
                   child: Text(
                     "${(widget.controller.value.position.inSeconds / 60).floor()}:${(widget.controller.value.position.inSeconds % 60)}/${(widget.controller.value.duration.inSeconds / 60).floor()}:${(widget.controller.value.duration.inSeconds % 60)}",
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                   ),
                 ),
                 Positioned(
@@ -293,7 +295,7 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
               buildBottomSheetSpeed();
             });
           },
-          child:   SizedBox(
+          child: SizedBox(
             height: 30,
             width: 30,
             // decoration: BoxDecoration(
@@ -302,7 +304,10 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
             //
             // ),
             child: Center(
-              child: Text("X${widget.controller.value.playbackSpeed}", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),),
+              child: Text(
+                "X${widget.controller.value.playbackSpeed}",
+                style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+              ),
             ),
           ),
         ),
@@ -370,7 +375,7 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
           behavior: HitTestBehavior.opaque,
           onTap: () async {
             if (MediaQuery.of(context).orientation == Orientation.portrait) {
-               SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,overlays :[]);
+              SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
 
               SystemChrome.setPreferredOrientations([
                 DeviceOrientation.landscapeRight,
@@ -379,12 +384,16 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
               widget.controller = await Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => LandscapeVideo(
-                          controller: widget.controller,
-                      videoList: widget.videoList!,
-                        ),),
+                  builder: (context) => LandscapeVideo(
+                    controller: widget.controller,
+                    videoList: widget.videoList!,
+                  ),
+                ),
               );
             } else {
+              widget.controller = widget.controller;
+              SystemChrome.restoreSystemUIOverlays();
+              SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: SystemUiOverlay.values);
               SystemChrome.setPreferredOrientations([
                 DeviceOrientation.portraitUp,
                 DeviceOrientation.portraitDown,
@@ -569,6 +578,7 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
       },
     );
   }
+
   void buildBottomSheetSpeed() {
     showModalBottomSheet(
       backgroundColor: Colors.white,
@@ -595,15 +605,16 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
                 Expanded(
                   child: SingleChildScrollView(
                     child: Column(
-                      children: List.generate(["X0.5","X1.0","X1.5","X2.0"].length, (index) {
+                      children: List.generate(["X0.5", "X1.0", "X1.5", "X2.0"].length, (index) {
                         return GestureDetector(
                           onTap: () {
                             // setState(() {
                             //   regulationSelectedIndex = index;
                             // });
-                            if ("X${widget.controller.value.playbackSpeed}" != ["X0.5","X1.0","X1.5","X2.0"][index]) {
-
-                              widget.controller.setPlaybackSpeed(double.parse(["X0.5","X1.0","X1.5","X2.0"][index].substring(1)));
+                            if ("X${widget.controller.value.playbackSpeed}" !=
+                                ["X0.5", "X1.0", "X1.5", "X2.0"][index]) {
+                              widget.controller
+                                  .setPlaybackSpeed(double.parse(["X0.5", "X1.0", "X1.5", "X2.0"][index].substring(1)));
                               // widget.onResolutionChanged(widget.controller.currentPlay[index]);
                             }
                             Navigator.pop(context);
@@ -611,7 +622,7 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
                           child: Container(
                             color: Colors.white,
                             child: buildRegulationItemSpeed(
-                              title: ["X0.5","X1.0","X1.5","X2.0"][index],
+                              title: ["X0.5", "X1.0", "X1.5", "X2.0"][index],
                             ),
                           ),
                         );
@@ -621,18 +632,16 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
                 ),
               if (!(MediaQuery.of(context).orientation == Orientation.landscape))
                 Column(
-                  children: List.generate(["X0.5","X1.0","X1.5","X2.0"].length, (index) {
+                  children: List.generate(["X0.5", "X1.0", "X1.5", "X2.0"].length, (index) {
                     return GestureDetector(
                       onTap: () {
                         // setState(() {
                         //   regulationSelectedIndex = index;
                         // });
-                        if ("X${widget.controller.value.playbackSpeed}" != ["X0.5","X1.0","X1.5","X2.0"][index]) {
-
-                          widget.controller.setPlaybackSpeed(double.parse(["X0.5","X1.0","X1.5","X2.0"][index].substring(1)));
-                          setState((){
-
-                          });
+                        if ("X${widget.controller.value.playbackSpeed}" != ["X0.5", "X1.0", "X1.5", "X2.0"][index]) {
+                          widget.controller
+                              .setPlaybackSpeed(double.parse(["X0.5", "X1.0", "X1.5", "X2.0"][index].substring(1)));
+                          setState(() {});
                           // widget.onResolutionChanged(widget.controller.currentPlay[index]);
                         }
                         Navigator.pop(context);
@@ -640,7 +649,7 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
                       child: Container(
                         color: Colors.white,
                         child: buildRegulationItemSpeed(
-                          title: ["X0.5","X1.0","X1.5","X2.0"][index],
+                          title: ["X0.5", "X1.0", "X1.5", "X2.0"][index],
                         ),
                       ),
                     );
@@ -684,7 +693,6 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
     );
   }
 
-
   Widget buildRegulationItemSpeed({required String title}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -696,17 +704,17 @@ class _BasicOverlayWidgetState extends State<BasicOverlayWidget> {
             children: [
               Text(
                 title,
-                style:"X${widget.controller.value.playbackSpeed}" == title
+                style: "X${widget.controller.value.playbackSpeed}" == title
                     ? TextStyle(
-                  color: CustomColor.kPrimaryColor,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                )
+                        color: CustomColor.kPrimaryColor,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      )
                     : const TextStyle(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14,
-                  color: Colors.black,
-                ),
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: Colors.black,
+                      ),
               ),
             ],
           ),
