@@ -7,6 +7,7 @@ GlobalKey<NavigatorState>? navigatorKey;
 GlobalKey<ScaffoldMessengerState>? snackbarKey;
 bool isNoNetworkProblem = false;
 bool is401Call = false;
+bool isNoInternetCall = false;
 bool is500Call = false;
 void onInternet({Function()? onRetry}) {
   snackbarKey!.currentState?.showSnackBar(
@@ -23,7 +24,7 @@ void onInternet({Function()? onRetry}) {
         textColor: Colors.blue,
         onPressed: () {
           snackbarKey!.currentState?.removeCurrentSnackBar();
-          is500Call = false;
+          isNoInternetCall = false;
           if (onRetry != null) {
             onRetry;
           }
