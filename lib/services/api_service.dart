@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mh_core/utils/color/custom_color.dart';
 import 'package:mh_core/utils/global.dart';
 import 'package:mh_core/widgets/button/custom_button.dart';
 
@@ -325,7 +326,7 @@ class ServiceAPI {
   }
 
   ///Alert Dialog
-  static void showProgressDialog(String? msg, {Widget? errorHandleButton}) {
+  static void showProgressDialog(String? msg, {Widget? errorHandleButton, Color? loadingColor}) {
     showDialog(
       context: navigatorKey!.currentContext!,
       barrierDismissible: false,
@@ -337,12 +338,12 @@ class ServiceAPI {
           textAlign: TextAlign.center,
         ),
         titlePadding: const EdgeInsets.only(top: 16),
-        content: const SizedBox(
+        content: SizedBox(
           width: 40,
           height: 40,
           child: Center(
             child: CircularProgressIndicator(
-              color: Colors.black,
+              color: loadingColor ?? CustomColor.kPrimaryColor,
             ),
           ),
         ),

@@ -20,6 +20,7 @@ class WebViewPage extends StatefulWidget {
 class _WebViewPageState extends State<WebViewPage> {
   WebViewController? _controller;
   bool isLoading = true;
+  int progressStatus = 0;
   @override
   void initState() {
     // TODO: implement initState
@@ -31,6 +32,8 @@ class _WebViewPageState extends State<WebViewPage> {
           onProgress: (int progress) {
             // Update loading bar.
             globalLogger.d(progress);
+            progressStatus = progress;
+            setState(() {});
             if (progress == 100) {
               isLoading = false;
               setState(() {});
