@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mh_core/utils/color/custom_color.dart';
 import 'package:mh_core/utils/global.dart';
 import 'package:mh_core/widgets/button/custom_button.dart';
 
@@ -27,8 +28,6 @@ class ServiceAPI {
   static String _authToken = '';
   static String _setCookie = '';
   static String _authTokenPrefix = 'Bearer';
-  static GlobalKey<NavigatorState>? _navigatorKey;
-  static setNavigatorKey(GlobalKey<NavigatorState> key) => _navigatorKey = key;
 
   // static const String apiUrl = "http://pos.wiztecbd.online/api/";
 
@@ -104,8 +103,8 @@ class ServiceAPI {
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
         globalLogger.d(result.map((e) => e.toString()).toList());
         // showSnackBar(msg: 'connected');
-        if (is500Call) {
-          is500Call = false;
+        if (isNoInternetCall) {
+          isNoInternetCall = false;
           snackbarKey!.currentState?.clearSnackBars();
         }
         if (isLoadingEnable) {
@@ -194,14 +193,14 @@ class ServiceAPI {
           }
           globalLogger.d(response.body);
           if ((response as http.Response).headers['set-cookie'] != null) {
-            _setCookie = (response as http.Response)
+            _setCookie = (response)
                 .headers['set-cookie']!
                 .toString()
                 .split(";")
                 .where((e) => e.contains('csrftoken') || e.contains('sessionid'))
                 .toList()
                 .map((e) => e.contains('csrftoken')
-                    ? e + ";"
+                    ? "$e;"
                     : e.contains("sessionid")
                         ? e.substring(e.indexOf("sessionid"))
                         : '')
@@ -222,6 +221,9 @@ class ServiceAPI {
 
           // Get.closeAllSnackbars();
           if (response.statusCode == 200 || response.statusCode == 201) {
+            if (is500Call) {
+              is500Call = false;
+            }
             if (httpPurpose == HttpPurpose.webScraping) return response.body;
             return jsonDecode(response.body);
           } else if (defaultErrorMsgShow) {
@@ -253,15 +255,27 @@ class ServiceAPI {
             } else if (response.statusCode == 500) {
               // isErrorHandleButtonExists
               //     ?
-              showAlert("The request was not completed due to an internal error on the server side!",
-                  errorHandleButton: isErrorHandleButtonExists
-                      ? CustomButton(
-                          primary: Colors.red,
-                          label: errorButtonLabel!,
-                          onPressed: errorButtonPressed,
-                          marginVertical: 8,
-                        )
-                      : null);
+              if (!is500Call) {
+                is500Call = true;
+
+                showAlert("The request was not completed due to an internal error on the server side!", onPressed: () {
+                  is500Call = false;
+                  navigatorKey!.currentState!.pop();
+                },
+                    errorHandleButton: isErrorHandleButtonExists
+                        ? CustomButton(
+                            primary: Colors.red,
+                            label: errorButtonLabel!,
+                            onPressed: () {
+                              is500Call = false;
+                              if (errorButtonPressed != null) {
+                                errorButtonPressed;
+                              }
+                            },
+                            marginVertical: 8,
+                          )
+                        : null);
+              }
             } else if (response.statusCode == 503) {
               showAlert("The server was unavailable!");
             } else {
@@ -275,9 +289,9 @@ class ServiceAPI {
         }
       }
     } on SocketException catch (_) {
-      if (!is500Call) {
+      if (!isNoInternetCall) {
         onInternet(onRetry: onInternetError);
-        is500Call = true;
+        isNoInternetCall = true;
       }
       // showSnackBar(msg: 'not connected');
       // print('not connected');
@@ -285,11 +299,13 @@ class ServiceAPI {
   }
 
   ///Alert Dialog
-  static void showAlert(String message, {Widget? errorHandleButton}) {
+  static void showAlert(String message, {Widget? errorHandleButton, Function()? onPressed}) {
     showDialog(
       context: navigatorKey!.currentContext!,
       builder: (context) => AlertDialog(
-        title: const Text("Error"),
+        title: const Center(
+          child: Text("Error"),
+        ),
         content: Text(
           message,
           textAlign: TextAlign.center,
@@ -298,9 +314,10 @@ class ServiceAPI {
           CustomButton(
             label: "OK",
             marginVertical: 8,
-            onPressed: () {
-              navigatorKey!.currentState!.pop();
-            },
+            onPressed: onPressed ??
+                () {
+                  navigatorKey!.currentState!.pop();
+                },
           ),
           if (errorHandleButton != null) errorHandleButton,
         ],
@@ -309,24 +326,24 @@ class ServiceAPI {
   }
 
   ///Alert Dialog
-  static void showProgressDialog(String? msg, {Widget? errorHandleButton}) {
+  static void showProgressDialog(String? msg, {Widget? errorHandleButton, Color? loadingColor}) {
     showDialog(
       context: navigatorKey!.currentContext!,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        contentPadding: EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 20, top: 16),
-        shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 20, top: 16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         title: Text(
           msg ?? 'Please Wait',
           textAlign: TextAlign.center,
         ),
-         titlePadding: EdgeInsets.only(top: 16),
-         content: const SizedBox(
+        titlePadding: const EdgeInsets.only(top: 16),
+        content: SizedBox(
           width: 40,
           height: 40,
           child: Center(
             child: CircularProgressIndicator(
-              color: Colors.black,
+              color: loadingColor ?? CustomColor.kPrimaryColor,
             ),
           ),
         ),

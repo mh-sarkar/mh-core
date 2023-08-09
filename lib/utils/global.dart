@@ -7,20 +7,24 @@ GlobalKey<NavigatorState>? navigatorKey;
 GlobalKey<ScaffoldMessengerState>? snackbarKey;
 bool isNoNetworkProblem = false;
 bool is401Call = false;
+bool isNoInternetCall = false;
 bool is500Call = false;
 void onInternet({Function()? onRetry}) {
   snackbarKey!.currentState?.showSnackBar(
     SnackBar(
       dismissDirection: DismissDirection.down,
       duration: const Duration(minutes: 5),
-      content: const Text('Your Device has no internet connection!', style: TextStyle(color:Colors.white),),
-      backgroundColor:Colors.black,
+      content: const Text(
+        'Your Device has no internet connection!',
+        style: TextStyle(color: Colors.white),
+      ),
+      backgroundColor: Colors.black,
       action: SnackBarAction(
         label: 'Retry',
         textColor: Colors.blue,
         onPressed: () {
           snackbarKey!.currentState?.removeCurrentSnackBar();
-          is500Call = false;
+          isNoInternetCall = false;
           if (onRetry != null) {
             onRetry;
           }
@@ -40,12 +44,11 @@ showSnackBar({
   DismissDirection? dismissDirection,
   Duration? duration,
 }) {
-  globalLogger.d("jj");
   snackbarKey!.currentState?.showSnackBar(
     SnackBar(
-      duration: duration?? const Duration(seconds: 4) ,
+      duration: duration ?? const Duration(seconds: 4),
       behavior: SnackBarBehavior.floating,
-      dismissDirection:dismissDirection?? DismissDirection.down,
+      dismissDirection: dismissDirection ?? DismissDirection.down,
       content: Text(
         msg,
         style: TextStyle(color: msgColor),

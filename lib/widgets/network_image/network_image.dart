@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mh_core/services/api_service.dart';
+import 'package:mh_core/utils/color/custom_color.dart';
 import 'package:mh_core/utils/image_utils.dart';
 
 /// [isFromAPI] is define your image from api or internet
@@ -19,18 +21,14 @@ import 'package:mh_core/utils/image_utils.dart';
 class CustomNetworkImage extends StatelessWidget {
   const CustomNetworkImage({
     Key? key,
-    this.networkImagePath,
     this.errorImagePath,
     this.borderRadius,
     this.imageColor,
     this.height,
     this.width,
-    required this.isFromAPI,
-    this.apiUrl,
-    this.apiExtraSlag,
-    this.networkImagePathFromAPI,
+    required this.networkImagePath,
     this.border = NetworkImageBorder.Circle,
-    required this.isPreviewPageNeed,
+    this.isPreviewPageNeed = false,
     this.isPreviewPageAppBarNeed = true,
     this.previewPageTitle,
     this.previewPageTitleColor,
@@ -38,16 +36,12 @@ class CustomNetworkImage extends StatelessWidget {
     this.errorIconData,
     this.fit,
   }) : super(key: key);
-  final bool isFromAPI;
   final bool isPreviewPageNeed;
   final bool isPreviewPageAppBarNeed;
   final String? previewPageTitle;
   final Color? previewPageTitleColor;
   final Color? previewPageAppBarColor;
-  final String? apiUrl;
-  final String? apiExtraSlag;
-  final String? networkImagePathFromAPI;
-  final String? networkImagePath;
+  final String networkImagePath;
   final String? errorImagePath;
   final IconData? errorIconData;
   final double? borderRadius;
@@ -66,11 +60,11 @@ class CustomNetworkImage extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) => ImagePreview(
                     imageList: [
-                      isFromAPI
-                          ? networkImagePathFromAPI!.contains(apiUrl!.replaceAll(apiExtraSlag ?? '/api', ''))
-                              ? networkImagePathFromAPI!
-                              : apiUrl!.replaceAll(apiExtraSlag ?? '/api', '') + networkImagePathFromAPI!
-                          : networkImagePath!
+                      networkImagePath.contains('http') ||
+                              networkImagePath.contains(
+                                  ServiceAPI.url!.replaceAll(ServiceAPI.apiUrl!.replaceAll(ServiceAPI.url!, ""), ''))
+                          ? networkImagePath
+                          : ServiceAPI.url! + networkImagePath,
                     ],
                     index: 0,
                     title: previewPageTitle,
@@ -85,11 +79,11 @@ class CustomNetworkImage extends StatelessWidget {
         borderRadius: BorderRadius.circular(
             border == NetworkImageBorder.Circle ? borderRadius ?? MediaQuery.of(context).size.height : 0),
         child: Image.network(
-          isFromAPI
-              ? networkImagePathFromAPI!.contains(apiUrl!.replaceAll(apiExtraSlag ?? '/api', ''))
-                  ? networkImagePathFromAPI!
-                  : apiUrl!.replaceAll(apiExtraSlag ?? '/api', '') + networkImagePathFromAPI!
-              : networkImagePath!,
+          networkImagePath.contains('http') ||
+                  networkImagePath
+                      .contains(ServiceAPI.url!.replaceAll(ServiceAPI.apiUrl!.replaceAll(ServiceAPI.url!, ""), ''))
+              ? networkImagePath
+              : ServiceAPI.url! + networkImagePath,
           fit: fit ?? BoxFit.cover,
           color: imageColor,
           loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
@@ -142,7 +136,7 @@ class ImagePreview extends StatefulWidget {
       this.title,
       this.titleColor = Colors.black,
       this.isAppBarShow = true,
-      this.appBarColor = Colors.white})
+      this.appBarColor})
       : super(key: key);
 
   @override
@@ -160,7 +154,7 @@ class _ImagePreviewState extends State<ImagePreview> {
               //   color: Colors.black, //change your color here
               // ),
               // automaticallyImplyLeading: false,
-              backgroundColor: widget.appBarColor,
+              backgroundColor: widget.appBarColor ?? CustomColor.kPrimaryColor,
               title: Text(
                 widget.title ?? "Untitled Image",
                 style: TextStyle(
