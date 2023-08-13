@@ -224,7 +224,7 @@ class ServiceAPI {
             if (is500Call) {
               is500Call = false;
             }
-            if (httpPurpose == HttpPurpose.webScraping) return response.body;
+            if (httpPurpose == HttpPurpose.webScraping) return response;
             return jsonDecode(response.body);
           } else if (defaultErrorMsgShow) {
             if (response.statusCode == 400) {
