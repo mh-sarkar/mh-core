@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
 class ImageUtils {
@@ -22,5 +23,20 @@ class ImageUtils {
     await file.writeAsBytes(byteData.buffer.asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
 
     return file;
+  }
+
+  static Future<String?> networkImageToBase64(String imageUrl) async {
+    http.Response response = await http.get(Uri.parse(imageUrl));
+    final bytes = response.bodyBytes;
+    return (bytes != null ? base64Encode(bytes) : null);
+  }
+
+  static String? localImageToBase64(String imagePath) {
+    if (imagePath.isEmpty) {
+      return null;
+    }
+    List<int> imageBytes = File(imagePath).readAsBytesSync();
+    String base64Image = base64Encode(imageBytes);
+    return base64Image;
   }
 }
