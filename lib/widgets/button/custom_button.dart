@@ -27,8 +27,12 @@ class CustomButton extends StatelessWidget {
     this.isDisable = false,
     this.prefixImage,
     this.suffixImage,
+    this.suffixImageHeight,
+    this.suffixImageWidth,
+    this.suffixImageColor,
     this.prefixImageHeight,
-    this.prefixImageWidth, this.prefixImageColor,
+    this.prefixImageWidth,
+    this.prefixImageColor,
   }) : super(key: key);
   final String label;
   final Function()? onPressed;
@@ -56,6 +60,9 @@ class CustomButton extends StatelessWidget {
   final double? prefixImageHeight;
   final double? prefixImageWidth;
   final Color? prefixImageColor;
+  final double? suffixImageHeight;
+  final double? suffixImageWidth;
+  final Color? suffixImageColor;
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +117,13 @@ class CustomButton extends StatelessWidget {
                   color: labelColor ?? Colors.white,
                 )),
             if (suffixImage != null) const SizedBox(width: 8),
-            if (suffixImage != null) Image.asset(suffixImage!),
+            if (suffixImage != null)
+              Image.asset(
+                suffixImage!,
+                color: suffixImageColor,
+                height: suffixImageHeight,
+                width: suffixImageWidth,
+              ),
           ],
         ),
       ),
