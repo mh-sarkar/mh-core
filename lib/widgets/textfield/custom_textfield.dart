@@ -35,7 +35,7 @@ class CustomTextField extends StatefulWidget {
   final Widget? suffixIcon;
   final FocusNode? focusNode;
   final TextInputType? keyboardType;
-  final bool? isRequired;
+  final bool isRequired;
   final bool isEnable;
   final ValueChanged<String>? onChanged;
   final double? marginTop;
@@ -78,12 +78,13 @@ class CustomTextField extends StatefulWidget {
     this.isInvalid = false,
     this.focusNode,
     this.keyboardType,
-    this.isRequired,
+    this.isRequired = false,
     this.onSubmitted,
     this.marginTop,
     this.marginLeft,
     this.marginRight,
-    this.marginBottom, this.borderWidth,
+    this.marginBottom,
+    this.borderWidth,
   }) : super(key: key);
 
   @override
@@ -116,12 +117,24 @@ class _CustomTextFieldState extends State<CustomTextField> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (widget.isLabelSeparated && widget.labelText != null)
-              Text(widget.labelText ?? '',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
-                    color: Colors.black,
-                  )),
+              Row(
+                children: [
+                  Text(widget.labelText ?? '',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        color: widget.labelColor ?? Colors.black,
+                      )),
+                  if (widget.isRequired)
+                    Text(
+                      ' *',
+                      style: TextStyle(
+                          color: Colors.red,
+                          fontSize: widget.labelSize,
+                          fontWeight: widget.labelFontWeight),
+                    )
+                ],
+              ),
             if (widget.isLabelSeparated && widget.labelText != null) space2C,
             Container(
               height: widget.maxLine > 1 ? null : widget.height ?? 44,
@@ -139,7 +152,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                       cursorColor: Colors.black,
                       obscureText: _obscureText,
                       controller: widget.controller,
-                      maxLines: widget.maxLine ?? 1,
+                      maxLines: widget.maxLine,
                       keyboardType: widget.keyboardType,
                       onFieldSubmitted: widget.onSubmitted,
                       style: TextStyle(
@@ -175,7 +188,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                             borderSide: BorderSide(
                               color:
                                   widget.focusColor ?? const Color(0xffD9D9D9),
-                              width:widget.borderWidth?? 1,
+                              width: widget.borderWidth ?? 1,
                             ),
                           ),
                           enabledBorder: OutlineInputBorder(
@@ -184,7 +197,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                             borderSide: BorderSide(
                               color: widget.enableBorderColor ??
                                   const Color(0xffD9D9D9),
-                              width:widget.borderWidth?? 1,
+                              width: widget.borderWidth ?? 1,
                             ),
                           ),
                           labelText:
