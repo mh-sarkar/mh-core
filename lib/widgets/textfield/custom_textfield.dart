@@ -43,6 +43,7 @@ class CustomTextField extends StatefulWidget {
   final double? marginRight;
   final double? marginBottom;
   final double? borderWidth;
+  final Color? suffixIconColor;
 
   const CustomTextField({
     Key? key,
@@ -85,6 +86,7 @@ class CustomTextField extends StatefulWidget {
     this.marginRight,
     this.marginBottom,
     this.borderWidth,
+    this.suffixIconColor,
   }) : super(key: key);
 
   @override
@@ -128,15 +130,13 @@ class _CustomTextFieldState extends State<CustomTextField> {
                   if (widget.isRequired)
                     Text(
                       ' *',
-                      style: TextStyle(
-                          color: Colors.red,
-                          fontSize: widget.labelSize,
-                          fontWeight: widget.labelFontWeight),
+                      style:
+                          TextStyle(color: Colors.red, fontSize: widget.labelSize, fontWeight: widget.labelFontWeight),
                     )
                 ],
               ),
             if (widget.isLabelSeparated && widget.labelText != null) space2C,
-            Container(
+            SizedBox(
               height: widget.maxLine > 1 ? null : widget.height ?? 44,
               width: widget.width ?? size.width,
               // margin: EdgeInsets.symmetric(
@@ -165,54 +165,41 @@ class _CustomTextFieldState extends State<CustomTextField> {
                           prefixIcon: widget.prefixWidget,
                           fillColor: widget.fillColor,
                           filled: widget.fillColor != null,
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 12, horizontal: 12),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
                           hintText: widget.hintText,
                           hintStyle: TextStyle(
-                            color: widget.hintColor ??
-                                const Color(0xff000000).withOpacity(0.40),
+                            color: widget.hintColor ?? const Color(0xff000000).withOpacity(0.40),
                             fontSize: widget.hintSize ?? 14,
-                            fontWeight:
-                                widget.hintFontWeight ?? FontWeight.w400,
+                            fontWeight: widget.hintFontWeight ?? FontWeight.w400,
                           ),
                           labelStyle: TextStyle(
-                            color: widget.labelColor ??
-                                Colors.black.withOpacity(.7),
+                            color: widget.labelColor ?? Colors.black.withOpacity(.7),
                             fontSize: widget.labelSize ?? 12,
-                            fontWeight:
-                                widget.labelFontWeight ?? FontWeight.w400,
+                            fontWeight: widget.labelFontWeight ?? FontWeight.w400,
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.circular(widget.borderRadius ?? 5),
+                            borderRadius: BorderRadius.circular(widget.borderRadius ?? 5),
                             borderSide: BorderSide(
-                              color:
-                                  widget.focusColor ?? const Color(0xffD9D9D9),
+                              color: widget.focusColor ?? const Color(0xffD9D9D9),
                               width: widget.borderWidth ?? 1,
                             ),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.circular(widget.borderRadius ?? 5),
+                            borderRadius: BorderRadius.circular(widget.borderRadius ?? 5),
                             borderSide: BorderSide(
-                              color: widget.enableBorderColor ??
-                                  const Color(0xffD9D9D9),
+                              color: widget.enableBorderColor ?? const Color(0xffD9D9D9),
                               width: widget.borderWidth ?? 1,
                             ),
                           ),
-                          labelText:
-                              widget.isLabelSeparated ? null : widget.labelText,
+                          labelText: widget.isLabelSeparated ? null : widget.labelText,
                           isDense: true,
                           suffixIcon: widget.isPassword!
                               ? InkWell(
                                   onTap: () {
                                     toogle();
                                   },
-                                  child: Icon(
-                                      _obscureText
-                                          ? Icons.visibility_off
-                                          : Icons.visibility,
-                                      color: const Color(0xff484848)),
+                                  child: Icon(_obscureText ? Icons.visibility_off : Icons.visibility,
+                                      color: widget.suffixIconColor ?? const Color(0xff484848)),
                                 )
                               : widget.suffixIcon),
                     ),

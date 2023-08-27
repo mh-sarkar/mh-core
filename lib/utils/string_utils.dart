@@ -63,6 +63,20 @@ extension NthOccurrenceOfSubstring on String {
   }
 }
 
+String findAndRemove(String rawStringData, String key, String nextPattern) {
+  if (rawStringData.isEmpty || !rawStringData.contains(key)) {
+    return rawStringData;
+  }
+  String newString = '';
+  // while (rawStringData.isNotEmpty && rawStringData.contains(key)) {
+  final getIndex = rawStringData.indexOf(key);
+  final subS = rawStringData.substring(getIndex);
+  final patternFind = subS.substring(0, subS.indexOf(nextPattern) + 1);
+  newString = rawStringData.replaceAll(patternFind, '');
+  // }
+  return newString;
+}
+
 String getTotalTime(List<String> list) {
   int hour = 0;
   int min = 0;
