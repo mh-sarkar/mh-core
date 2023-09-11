@@ -67,13 +67,13 @@ String findAndRemove(String rawStringData, String key, String nextPattern) {
   if (rawStringData.isEmpty || !rawStringData.contains(key)) {
     return rawStringData;
   }
-  String newString = '';
-  // while (rawStringData.isNotEmpty && rawStringData.contains(key)) {
-  final getIndex = rawStringData.indexOf(key);
-  final subS = rawStringData.substring(getIndex);
+  String newString = rawStringData;
+  while (newString.isNotEmpty && newString.contains(key)) {
+  final getIndex = newString.indexOf(key);
+  final subS = newString.substring(getIndex);
   final patternFind = subS.substring(0, subS.indexOf(nextPattern) + 1);
-  newString = rawStringData.replaceAll(patternFind, '');
-  // }
+  newString = newString.replaceAll(patternFind, '');
+  }
   return newString;
 }
 
