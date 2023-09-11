@@ -19,6 +19,7 @@ class ServiceAPI {
   static extraSlag(String? path) => _apiUrl = _url + (path ?? '');
   static get apiUrl => _apiUrl;
   static get getCookie => _setCookie;
+  static get getToken => _authToken;
   static setCookie(String cookie) => _setCookie = cookie;
   static setAuthToken(String token) => _authToken = token;
   static setAuthTokenPrefix(String prefix) => _authTokenPrefix = prefix;
