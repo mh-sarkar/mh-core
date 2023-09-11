@@ -35,6 +35,8 @@ class CustomNetworkImage extends StatelessWidget {
     this.previewPageAppBarColor,
     this.errorIconData,
     this.fit,
+    this.loadingImagePath,
+    this.loadingIconData,
   }) : super(key: key);
   final bool isPreviewPageNeed;
   final bool isPreviewPageAppBarNeed;
@@ -44,6 +46,8 @@ class CustomNetworkImage extends StatelessWidget {
   final String networkImagePath;
   final String? errorImagePath;
   final IconData? errorIconData;
+  final String? loadingImagePath;
+  final IconData? loadingIconData;
   final double? borderRadius;
   final double? height;
   final double? width;
@@ -88,7 +92,30 @@ class CustomNetworkImage extends StatelessWidget {
           color: imageColor,
           loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
             if (loadingProgress == null) return child;
-            return Center(
+            return /*FutureBuilder(
+                future: ImageUtils.getImageFileFromAssets(loadingImagePath ?? 'assets/images/error.png'),
+                builder: (context, a) {
+                  return
+
+                    a.data != null
+                      ? Image.file(
+                          a.data!,
+                          color: imageColor,
+                          height: height ?? MediaQuery.of(context).size.width * .3,
+                          width: width ?? MediaQuery.of(context).size.width * .3,
+                          fit: fit ?? BoxFit.cover,
+                        )
+                      : Icon(
+                          loadingIconData ?? Icons.cloud_download_rounded,
+                          color: imageColor ?? Colors.blue,
+                          size: (width ?? MediaQuery.of(context).size.width * .3) >
+                                  (height ?? MediaQuery.of(context).size.width * .3)
+                              ? (height ?? MediaQuery.of(context).size.width * .3)
+                              : (width ?? MediaQuery.of(context).size.width * .3),
+                        );
+                });*/
+
+                Center(
               child: CircularProgressIndicator(
                 value: loadingProgress.expectedTotalBytes != null
                     ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
@@ -110,7 +137,10 @@ class CustomNetworkImage extends StatelessWidget {
                     : Icon(
                         errorIconData ?? Icons.error,
                         color: imageColor ?? Colors.red,
-                        size: width ?? MediaQuery.of(context).size.width * .3,
+                        size: (width ?? MediaQuery.of(context).size.width * .3) >
+                                (height ?? MediaQuery.of(context).size.width * .3)
+                            ? (height ?? MediaQuery.of(context).size.width * .3)
+                            : (width ?? MediaQuery.of(context).size.width * .3),
                       );
               }),
           height: height ?? MediaQuery.of(context).size.width * .3,
