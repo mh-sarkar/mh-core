@@ -34,6 +34,8 @@ void onInternet({Function()? onRetry}) {
   );
 }
 
+Future<void> Function()? callBack404Func;
+
 showSnackBar({
   required String msg,
   String? actionLabel,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mh_core/utils/color/custom_color.dart';
 import 'package:mh_core/utils/constant.dart';
 
-enum DropdownListType { none, object }
+enum DropdownListType { none, object, json }
 
 class TitleDropdown extends StatelessWidget {
   final String? dwValue;
