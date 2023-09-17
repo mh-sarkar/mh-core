@@ -22,13 +22,15 @@ class ServiceAPI {
   static get getToken => _authToken;
   static setCookie(String cookie) => _setCookie = cookie;
   static setAuthToken(String token) => _authToken = token;
+  static setAuthTokenKey(String key) => _authTokenKey = key;
   static setAuthTokenPrefix(String prefix) => _authTokenPrefix = prefix;
   static delAuthToken(_) => _authToken = '';
   static String _url = '';
   static String _apiUrl = '';
   static String _authToken = '';
   static String _setCookie = '';
-  static String _authTokenPrefix = 'Bearer';
+  static String _authTokenPrefix = 'Bearer ';
+  static String _authTokenKey = 'Authorization';
 
   // static const String apiUrl = "http://pos.wiztecbd.online/api/";
 
@@ -115,7 +117,7 @@ class ServiceAPI {
           final authHeader = {
             if (needJsonContentType) 'Content-Type': 'application/json; charset=UTF-8',
             if (needJsonAccept) 'Accept': 'application/json',
-            'Authorization': '$_authTokenPrefix $_authToken',
+            _authTokenKey: '$_authTokenPrefix$_authToken',
             if (needCookie) 'Cookie': _setCookie.replaceAll(";", "; "),
           };
           globalLogger.d('$_authTokenPrefix $_authToken');
@@ -218,6 +220,12 @@ class ServiceAPI {
           }
           if (is401Call) {
             is401Call = false;
+          }
+
+          if(response.statusCode == 401){
+            if(callBack404Func!=null){
+              callBack404Func?.call();
+            }
           }
 
           // Get.closeAllSnackbars();
