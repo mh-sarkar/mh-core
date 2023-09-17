@@ -29,6 +29,18 @@ String chatTimeAgo({required String date}) {
                   : "Just now";
 }
 
+String getTimeFromSecond(String? second, {String? secondSuffix = 's',String? minuteSuffix = 'm',String? hourSuffix = 'h',}){
+  if(second==null || second.isEmpty){
+    return '0';
+  }
+  int givenSec = double.parse(second).floor();
+  int hour =( givenSec/3600).floor();
+  int minute =(( givenSec % 3600) /60).floor();
+  int sec =(( givenSec % 3600) %60);
+
+  return '${hour!=0?'$hour $hourSuffix':''} ${minute!=0?'$minute $minuteSuffix':''} ${sec!=0?'$sec $secondSuffix':''}';
+}
+
 String getTime(String data) {
   if (data.length == 3) {
     return "${data.replaceAll(':', '')} m 00 s";

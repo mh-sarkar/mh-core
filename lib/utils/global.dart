@@ -9,6 +9,7 @@ bool isNoNetworkProblem = false;
 bool is401Call = false;
 bool isNoInternetCall = false;
 bool is500Call = false;
+int snackBarDurationInSec = 4;
 void onInternet({Function()? onRetry}) {
   snackbarKey!.currentState?.showSnackBar(
     SnackBar(
@@ -46,7 +47,7 @@ showSnackBar({
 }) {
   snackbarKey!.currentState?.showSnackBar(
     SnackBar(
-      duration: duration ?? const Duration(seconds: 4),
+      duration: duration ?? Duration(seconds: snackBarDurationInSec),
       behavior: SnackBarBehavior.floating,
       dismissDirection: dismissDirection ?? DismissDirection.down,
       content: Text(
