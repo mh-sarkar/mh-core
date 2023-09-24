@@ -33,6 +33,7 @@ class CustomButton extends StatelessWidget {
     this.prefixImageHeight,
     this.prefixImageWidth,
     this.prefixImageColor,
+    this.loading = false,
   }) : super(key: key);
   final String label;
   final Function()? onPressed;
@@ -63,6 +64,7 @@ class CustomButton extends StatelessWidget {
   final double? suffixImageHeight;
   final double? suffixImageWidth;
   final Color? suffixImageColor;
+  final bool loading;
 
   @override
   Widget build(BuildContext context) {
@@ -99,33 +101,37 @@ class CustomButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(borderRadiusAll ?? 4),
           ),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (prefixImage != null)
-              Image.asset(
-                prefixImage!,
-                width: prefixImageWidth,
-                height: prefixImageHeight,
-                color: prefixImageColor,
+        child: loading
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (prefixImage != null)
+                    Image.asset(
+                      prefixImage!,
+                      width: prefixImageWidth,
+                      height: prefixImageHeight,
+                      color: prefixImageColor,
+                    ),
+                  if (prefixImage != null) const SizedBox(width: 8),
+                  Text(label,
+                      style: TextStyle(
+                        fontSize: fontSize ?? 14,
+                        fontWeight: fontWeight ?? FontWeight.w600,
+                        color: labelColor ?? Colors.white,
+                      )),
+                  if (suffixImage != null) const SizedBox(width: 8),
+                  if (suffixImage != null)
+                    Image.asset(
+                      suffixImage!,
+                      color: suffixImageColor,
+                      height: suffixImageHeight,
+                      width: suffixImageWidth,
+                    ),
+                ],
               ),
-            if (prefixImage != null) const SizedBox(width: 8),
-            Text(label,
-                style: TextStyle(
-                  fontSize: fontSize ?? 14,
-                  fontWeight: fontWeight ?? FontWeight.w600,
-                  color: labelColor ?? Colors.white,
-                )),
-            if (suffixImage != null) const SizedBox(width: 8),
-            if (suffixImage != null)
-              Image.asset(
-                suffixImage!,
-                color: suffixImageColor,
-                height: suffixImageHeight,
-                width: suffixImageWidth,
-              ),
-          ],
-        ),
       ),
     );
   }

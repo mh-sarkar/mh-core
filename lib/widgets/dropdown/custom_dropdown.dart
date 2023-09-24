@@ -38,6 +38,7 @@ class TitleDropdown extends StatelessWidget {
   final bool isTitle;
   final bool isRightIcon;
   final DropdownListType? type;
+  final String? additionFlagText;
 
   const TitleDropdown({
     super.key,
@@ -74,6 +75,7 @@ class TitleDropdown extends StatelessWidget {
     this.fillColor,
     this.dropDownIconData,
     this.rightIconBgColor,
+    this.additionFlagText,
   });
 
   @override
@@ -93,11 +95,12 @@ class TitleDropdown extends StatelessWidget {
         children: [
           if (isTitle)
             Text(title ?? '',
-                style:titleStyle?? const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                  color: Colors.black,
-                )),
+                style: titleStyle ??
+                    const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      color: Colors.black,
+                    )),
           if (isTitle) space2C,
           Container(
             // padding: EdgeInsets.symmetric(horizontal: horizontalPadding ?? 16),
@@ -105,11 +108,17 @@ class TitleDropdown extends StatelessWidget {
             height: height ?? 44,
             decoration: BoxDecoration(
                 color: fillColor ?? const Color(0xffFCFCFA),
-                border: isBorder ? Border.all(color: borderColor ?? Colors.black.withOpacity(.14), width: 1) : null,
+                border: isBorder
+                    ? Border.all(
+                        color: borderColor ?? Colors.black.withOpacity(.14),
+                        width: 1)
+                    : null,
                 borderRadius: BorderRadius.circular(circularBorderRadius ?? 5),
                 boxShadow: [
                   BoxShadow(
-                      offset: const Offset(0.0, 4.0), blurRadius: 16, color: const Color(0xff25251C).withOpacity(.05))
+                      offset: const Offset(0.0, 4.0),
+                      blurRadius: 16,
+                      color: const Color(0xff25251C).withOpacity(.05))
                 ]),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(circularBorderRadius ?? 5),
@@ -118,7 +127,8 @@ class TitleDropdown extends StatelessWidget {
                   dropdownColor: const Color(0xffFCFCFA),
                   hint: Container(
                     alignment: Alignment.centerLeft,
-                    padding: EdgeInsets.symmetric(horizontal: horizontalContentPadding ?? 8),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: horizontalContentPadding ?? 8),
                     child: Text(
                       hintText ?? '',
                       style: hintTextStyle ??
@@ -130,7 +140,8 @@ class TitleDropdown extends StatelessWidget {
                     ),
                   ),
                   icon: Container(
-                    margin: EdgeInsets.only(right: horizontalContentPadding ?? 8),
+                    margin:
+                        EdgeInsets.only(right: horizontalContentPadding ?? 8),
                     height: (height ?? 44) - 8,
                     width: (height ?? 44) - 8,
                     decoration: BoxDecoration(
@@ -138,7 +149,9 @@ class TitleDropdown extends StatelessWidget {
                       color: rightIconBgColor ?? CustomColor.kPrimaryColor,
                     ),
                     child: Center(
-                      child: Icon(dropDownIconData ?? Icons.keyboard_arrow_down_outlined,
+                      child: Icon(
+                          dropDownIconData ??
+                              Icons.keyboard_arrow_down_outlined,
                           color: rightIconColor ?? CustomColor.kTextColor),
                     ),
                   ),
@@ -149,17 +162,26 @@ class TitleDropdown extends StatelessWidget {
                     onChange(newValue);
                   },
                   items: dwItems
-                      .map((e) => type == DropdownListType.object ? e.toJson() : e)
+                      .map((e) =>
+                          type == DropdownListType.object ? e.toJson() : e)
                       .toList()
                       .map(
                         (item) => DropdownMenuItem<String>(
-                          value: type == DropdownListType.none ? item : item[valueKey],
+                          value: type == DropdownListType.none
+                              ? item
+                              : item[valueKey],
                           child: Align(
                             alignment: Alignment.centerLeft,
                             child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: horizontalContentPadding ?? 8),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: horizontalContentPadding ?? 8),
                               child: Text(
-                                type == DropdownListType.none ? item : item[viewKey],
+                                (type == DropdownListType.none
+                                        ? item
+                                        : item[viewKey]) +
+                                    (additionFlagText != null
+                                        ? ' $additionFlagText'
+                                        : ''),
                                 style: textStyle ??
                                     const TextStyle(
                                       color: Colors.black,
