@@ -139,7 +139,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
               ),
             if (widget.isLabelSeparated && widget.labelText != null) space2C,
             SizedBox(
-              height: widget.maxLine == null && widget.maxLine! > 1
+              height: widget.maxLine == null &&
+                      (widget.maxLine != null && widget.maxLine! > 1)
                   ? null
                   : widget.height ?? 44,
               width: widget.width ?? size.width,

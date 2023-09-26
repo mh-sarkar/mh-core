@@ -88,6 +88,9 @@ class CustomButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isDisable ? () {} : onPressed,
         style: ElevatedButton.styleFrom(
+          splashFactory: isDisable ? NoSplash.splashFactory : null,
+          disabledBackgroundColor: primary ?? CustomColor.kPrimaryColor,
+          disabledForegroundColor: primary ?? CustomColor.kPrimaryColor,
           foregroundColor: primary ?? CustomColor.kPrimaryColor,
           backgroundColor: primary ?? CustomColor.kPrimaryColor,
           elevation: elevation,
@@ -102,8 +105,12 @@ class CustomButton extends StatelessWidget {
           ),
         ),
         child: loading
-            ? const Center(
-                child: CircularProgressIndicator(),
+            ? SizedBox(
+                height: (height ?? 48) - 15,
+                width: (height ?? 48) - 15,
+                child: const Center(
+                  child: CircularProgressIndicator(),
+                ),
               )
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
