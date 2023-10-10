@@ -34,6 +34,11 @@ class CustomButton extends StatelessWidget {
     this.prefixImageWidth,
     this.prefixImageColor,
     this.loading = false,
+    this.loadingColor,
+    this.disableColor,
+    this.loadingHeight,
+    this.loadingWidth,
+    this.loadingStrokeWidth = 4.0,
   }) : super(key: key);
   final String label;
   final Function()? onPressed;
@@ -61,6 +66,11 @@ class CustomButton extends StatelessWidget {
   final double? prefixImageHeight;
   final double? prefixImageWidth;
   final Color? prefixImageColor;
+  final Color? loadingColor;
+  final Color? disableColor;
+  final double? loadingHeight;
+  final double? loadingWidth;
+  final double loadingStrokeWidth;
   final double? suffixImageHeight;
   final double? suffixImageWidth;
   final Color? suffixImageColor;
@@ -86,30 +96,33 @@ class CustomButton extends StatelessWidget {
         ],
       ),
       child: ElevatedButton(
-        onPressed: isDisable ? () {} : onPressed,
+        onPressed: loading
+            ? () {}
+            : isDisable
+                ? null
+                : onPressed,
         style: ElevatedButton.styleFrom(
           splashFactory: isDisable ? NoSplash.splashFactory : null,
-          disabledBackgroundColor: primary ?? CustomColor.kPrimaryColor,
-          disabledForegroundColor: primary ?? CustomColor.kPrimaryColor,
+          disabledBackgroundColor: disableColor ?? (primary ?? CustomColor.kPrimaryColor).withOpacity(.5),
+          disabledForegroundColor: disableColor ?? (primary ?? CustomColor.kPrimaryColor).withOpacity(.5),
           foregroundColor: primary ?? CustomColor.kPrimaryColor,
           backgroundColor: primary ?? CustomColor.kPrimaryColor,
           elevation: elevation,
-          padding: EdgeInsets.symmetric(
-              horizontal: contentHorizontalPadding ?? contentPadding ?? 8,
-              vertical: contentVerticalPadding ?? contentPadding ?? 8),
+          padding: EdgeInsets.symmetric(horizontal: contentHorizontalPadding ?? contentPadding ?? 8, vertical: contentVerticalPadding ?? contentPadding ?? 8),
           shape: RoundedRectangleBorder(
-            side: isBorder
-                ? BorderSide(color: borderColor ?? Colors.black, width: 1)
-                : BorderSide.none,
+            side: isBorder ? BorderSide(color: borderColor ?? Colors.black, width: 1) : BorderSide.none,
             borderRadius: BorderRadius.circular(borderRadiusAll ?? 4),
           ),
         ),
         child: loading
             ? SizedBox(
-                height: (height ?? 48) - 15,
-                width: (height ?? 48) - 15,
-                child: const Center(
-                  child: CircularProgressIndicator(),
+                height: loadingHeight ?? ((height ?? 48) - 15),
+                width: loadingWidth ?? ((height ?? 48) - 15),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: loadingStrokeWidth,
+                    valueColor: AlwaysStoppedAnimation<Color>(loadingColor ?? Colors.white),
+                  ),
                 ),
               )
             : Row(
