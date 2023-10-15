@@ -35,7 +35,9 @@ void onInternet({Function()? onRetry}) {
   );
 }
 
+@Deprecated('Use [callBack401Func]')
 Future<void> Function()? callBack404Func;
+Future<void> Function()? callBack401Func;
 
 showSnackBar({
   required String msg,

@@ -132,8 +132,7 @@ class ServiceAPI {
 
             if (imageListWithKeyValue != null) {
               for (int i = 0; i < imageListWithKeyValue.length; i++) {
-                request.files.add(await http.MultipartFile.fromPath(
-                    imageListWithKeyValue[i]['key'], imageListWithKeyValue[i]['value']));
+                request.files.add(await http.MultipartFile.fromPath(imageListWithKeyValue[i]['key'], imageListWithKeyValue[i]['value']));
               }
             }
 
@@ -155,44 +154,35 @@ class ServiceAPI {
             response = await http.Response.fromStream(res);
           } else {
             response = (httpMethod == HttpMethod.get
-                ? await http
-                    .get(urlL, headers: noNeedAuthToken ? headers : authHeader)
-                    .timeout(const Duration(seconds: 20), onTimeout: () {
+                ? await http.get(urlL, headers: noNeedAuthToken ? headers : authHeader).timeout(const Duration(seconds: 20), onTimeout: () {
                     return http.Response('Token Error', 500);
                   }).catchError((e) {
                     globalLogger.e(e.toString());
                     return http.Response('Token Error', 500);
                   })
                 : httpMethod == HttpMethod.post
-                    ? await http
-                        .post(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding)
-                        .timeout(const Duration(seconds: 20), onTimeout: () {
+                    ? await http.post(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding).timeout(const Duration(seconds: 20), onTimeout: () {
                         return http.Response('Token Error', 500);
                       }).catchError((e) {
                         globalLogger.e(e.toString());
                         return http.Response('Token Error', 500);
                       })
                     : httpMethod == HttpMethod.put
-                        ? await http
-                            .put(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding)
-                            .timeout(const Duration(seconds: 20), onTimeout: () {
+                        ? await http.put(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding).timeout(const Duration(seconds: 20), onTimeout: () {
                             return http.Response('Token Error', 500);
                           }).catchError((e) {
                             globalLogger.e(e.toString());
                             return http.Response('Token Error', 500);
                           })
                         : httpMethod == HttpMethod.patch
-                            ? await http
-                                .patch(urlL,
-                                    headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding)
-                                .timeout(const Duration(seconds: 20), onTimeout: () {
+                            ? await http.patch(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding).timeout(const Duration(seconds: 20),
+                                onTimeout: () {
                                 return http.Response('Token Error', 500);
                               }).catchError((e) {
                                 globalLogger.e(e.toString());
                                 return http.Response('Token Error', 500);
                               })
-                            : await http.delete(urlL,
-                                headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding));
+                            : await http.delete(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding));
           }
           globalLogger.d(response.body);
           if ((response as http.Response).headers['set-cookie'] != null) {
@@ -222,9 +212,12 @@ class ServiceAPI {
             is401Call = false;
           }
 
-          if(response.statusCode == 401){
-            if(callBack404Func!=null){
-              callBack404Func?.call();
+          if (response.statusCode == 401) {
+            // if (callBack404Func != null) {
+            //   callBack404Func?.call();
+            // }
+            if (callBack401Func != null) {
+              callBack401Func?.call();
             }
           }
 
