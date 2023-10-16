@@ -64,6 +64,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:mh_core/utils/constant.dart';
 import 'package:mh_core/utils/global.dart';
 
 ///determines the position of the toast
@@ -101,6 +102,7 @@ class ToastManager {
 
     ///message text color
     Color? textColor,
+    String? imagePath,
 
     ///message text alignment default is center
     TextAlign? messageAlignment,
@@ -127,6 +129,7 @@ class ToastManager {
               messageAlignment: messageAlignment,
               messageFontSize: messageFontSize,
               textColor: textColor,
+              imagePath: imagePath,
             )
           : Positioned(
               top: toastPosition == ToastPosition.top
@@ -144,6 +147,7 @@ class ToastManager {
                 messageAlignment: messageAlignment,
                 messageFontSize: messageFontSize,
                 textColor: textColor,
+                imagePath: imagePath,
               ),
             ),
     );
@@ -181,7 +185,8 @@ class ToastWidget extends StatelessWidget {
       this.messageAlignment,
       this.borderRadius,
       this.messageFontSize = 14,
-      this.topMargin});
+      this.topMargin,
+      this.imagePath});
 
   ///background of the toast
   final Color? backgroundColor;
@@ -189,6 +194,7 @@ class ToastWidget extends StatelessWidget {
   ///message text color
   final Color? textColor;
   final String message;
+  final String? imagePath;
 
   ///message text alignment default is center
   final TextAlign? messageAlignment;
@@ -214,14 +220,30 @@ class ToastWidget extends StatelessWidget {
               const BorderRadius.all(
                 Radius.circular(50),
               ),
+          boxShadow: [
+            BoxShadow(color: Colors.black12, blurRadius: 5),
+          ],
         ),
-        child: Text(
-          message,
-          style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                color: textColor ?? Colors.white,
-                fontSize: messageFontSize,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (imagePath != null)
+              Image.asset(
+                imagePath!,
+                width: 16,
               ),
-          textAlign: messageAlignment ?? TextAlign.center,
+            if (imagePath != null) space2R,
+            Flexible(
+              child: Text(
+                message,
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color: textColor ?? Colors.white,
+                      fontSize: messageFontSize,
+                    ),
+                textAlign: messageAlignment ?? TextAlign.center,
+              ),
+            ),
+          ],
         ),
       ),
     );
