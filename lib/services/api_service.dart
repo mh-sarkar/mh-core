@@ -91,6 +91,7 @@ class ServiceAPI {
     bool noNeedAuthToken = false,
     bool isLoadingEnable = false,
     bool isFailedResponseNeed = false,
+    bool showErrorResponse = false,
     bool defaultErrorMsgShow = true,
     bool isErrorHandleButtonExists = false,
     bool needCookie = false,
@@ -101,6 +102,7 @@ class ServiceAPI {
     Function()? errorButtonPressed,
     Function()? onInternetError,
   }) async {
+    dynamic response;
     try {
       final result = await InternetAddress.lookup('example.com');
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
@@ -122,7 +124,6 @@ class ServiceAPI {
           };
           globalLogger.d('$_authTokenPrefix $_authToken');
           final urlL = Uri.parse(url);
-          dynamic response;
           if (httpMethod == HttpMethod.multipartFilePost) {
             var request = http.MultipartRequest("POST", urlL);
             request.headers.addAll(noNeedAuthToken ? headers ?? {} : authHeader);
@@ -287,7 +288,7 @@ class ServiceAPI {
           return jsonDecode(response.body);
         } catch (e) {
           globalLogger.e(e);
-          return {};
+          return showErrorResponse ? response : {};
         }
       }
     } on SocketException catch (_) {
