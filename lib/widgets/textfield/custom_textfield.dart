@@ -46,6 +46,7 @@ class CustomTextField extends StatefulWidget {
   final Color? suffixIconColor;
   final Color? errorFillColor;
   final Color? errorColor;
+  final TextAlign textAlign;
 
   const CustomTextField({
     Key? key,
@@ -91,6 +92,7 @@ class CustomTextField extends StatefulWidget {
     this.suffixIconColor,
     this.errorColor,
     this.errorFillColor,
+    this.textAlign = TextAlign.start,
   }) : super(key: key);
 
   @override
@@ -157,6 +159,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     controller: widget.controller,
                     maxLines: widget.maxLine,
                     keyboardType: widget.keyboardType,
+                    textAlign: widget.textAlign,
                     onFieldSubmitted: widget.onSubmitted,
                     style: TextStyle(
                       color: widget.textColor ?? Colors.black,
