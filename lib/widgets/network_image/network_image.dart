@@ -37,10 +37,12 @@ class CustomNetworkImage extends StatelessWidget {
     this.fit,
     this.loadingImagePath,
     this.loadingIconData,
+    this.backgroundColor,
   }) : super(key: key);
   final bool isPreviewPageNeed;
   final bool isPreviewPageAppBarNeed;
   final String? previewPageTitle;
+  final Color? backgroundColor;
   final Color? previewPageTitleColor;
   final Color? previewPageAppBarColor;
   final String networkImagePath;
@@ -80,7 +82,7 @@ class CustomNetworkImage extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(border == NetworkImageBorder.Circle ? borderRadius ?? MediaQuery.of(context).size.height : 0),
         child: Container(
-          color: Colors.white,
+          color: backgroundColor,
           height: height ?? MediaQuery.of(context).size.width * .3,
           width: width ?? MediaQuery.of(context).size.width * .3,
           child: Center(
@@ -115,10 +117,15 @@ class CustomNetworkImage extends StatelessWidget {
                             );
                     });*/
 
-                    Center(
-                  child: CircularProgressIndicator(
-                    value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes! : null,
-                    color: CustomColor.kPrimaryColor,
+                    Container(
+                  color: Colors.white,
+                  height: height ?? MediaQuery.of(context).size.width * .3,
+                  width: width ?? MediaQuery.of(context).size.width * .3,
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes! : null,
+                      color: CustomColor.kPrimaryColor,
+                    ),
                   ),
                 );
               },
