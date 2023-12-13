@@ -38,6 +38,7 @@ class CustomNetworkImage extends StatelessWidget {
     this.loadingImagePath,
     this.loadingIconData,
     this.backgroundColor,
+    this.imagePathList,
   }) : super(key: key);
   final bool isPreviewPageNeed;
   final bool isPreviewPageAppBarNeed;
@@ -56,6 +57,7 @@ class CustomNetworkImage extends StatelessWidget {
   final Color? imageColor;
   final BoxFit? fit;
   final NetworkImageBorder? border;
+  final List<String>? imagePathList;
 
   @override
   Widget build(BuildContext context) {
@@ -65,12 +67,27 @@ class CustomNetworkImage extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => ImagePreview(
-                    imageList: [
-                      networkImagePath.contains('http') || networkImagePath.contains(ServiceAPI.url!.replaceAll(ServiceAPI.apiUrl!.replaceAll(ServiceAPI.url!, ""), ''))
-                          ? networkImagePath
-                          : ServiceAPI.url! + networkImagePath,
-                    ],
-                    index: 0,
+                    imageList: imagePathList ??
+                        [
+                          networkImagePath.contains('http') ||
+                                  networkImagePath.contains(ServiceAPI.url!
+                                      .replaceAll(
+                                          ServiceAPI.apiUrl!
+                                              .replaceAll(ServiceAPI.url!, ""),
+                                          ''))
+                              ? networkImagePath
+                              : ServiceAPI.url! + networkImagePath,
+                        ],
+                    index: imagePathList?.indexOf(networkImagePath
+                                    .contains('http') ||
+                                networkImagePath.contains(ServiceAPI.url!
+                                    .replaceAll(
+                                        ServiceAPI.apiUrl!
+                                            .replaceAll(ServiceAPI.url!, ""),
+                                        ''))
+                            ? networkImagePath
+                            : ServiceAPI.url! + networkImagePath) ??
+                        0,
                     title: previewPageTitle,
                     titleColor: previewPageTitleColor,
                     isAppBarShow: isPreviewPageAppBarNeed,
@@ -80,19 +97,25 @@ class CustomNetworkImage extends StatelessWidget {
               )
           : null,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(border == NetworkImageBorder.Circle ? borderRadius ?? MediaQuery.of(context).size.height : 0),
+        borderRadius: BorderRadius.circular(border == NetworkImageBorder.Circle
+            ? borderRadius ?? MediaQuery.of(context).size.height
+            : 0),
         child: Container(
           color: backgroundColor,
           height: height ?? MediaQuery.of(context).size.width * .3,
           width: width ?? MediaQuery.of(context).size.width * .3,
           child: Center(
             child: Image.network(
-              networkImagePath.contains('http') || networkImagePath.contains(ServiceAPI.url!.replaceAll(ServiceAPI.apiUrl!.replaceAll(ServiceAPI.url!, ""), ''))
+              networkImagePath.contains('http') ||
+                      networkImagePath.contains(ServiceAPI.url!.replaceAll(
+                          ServiceAPI.apiUrl!.replaceAll(ServiceAPI.url!, ""),
+                          ''))
                   ? networkImagePath
                   : ServiceAPI.url! + networkImagePath,
               fit: fit ?? BoxFit.cover,
               color: imageColor,
-              loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+              loadingBuilder: (BuildContext context, Widget child,
+                  ImageChunkEvent? loadingProgress) {
                 if (loadingProgress == null) return child;
                 return /*FutureBuilder(
                     future: ImageUtils.getImageFileFromAssets(loadingImagePath ?? 'assets/images/error.png'),
@@ -123,29 +146,41 @@ class CustomNetworkImage extends StatelessWidget {
                   width: width ?? MediaQuery.of(context).size.width * .3,
                   child: Center(
                     child: CircularProgressIndicator(
-                      value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes! : null,
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                              loadingProgress.expectedTotalBytes!
+                          : null,
                       color: CustomColor.kPrimaryColor,
                     ),
                   ),
                 );
               },
               errorBuilder: (context, exception, stackTrack) => FutureBuilder(
-                  future: ImageUtils.getImageFileFromAssets(errorImagePath ?? 'assets/images/error.png'),
+                  future: ImageUtils.getImageFileFromAssets(
+                      errorImagePath ?? 'assets/images/error.png'),
                   builder: (context, a) {
                     return a.data != null
                         ? Image.file(
                             a.data!,
                             color: imageColor,
-                            height: height ?? MediaQuery.of(context).size.width * .3,
-                            width: width ?? MediaQuery.of(context).size.width * .3,
+                            height: height ??
+                                MediaQuery.of(context).size.width * .3,
+                            width:
+                                width ?? MediaQuery.of(context).size.width * .3,
                             fit: fit ?? BoxFit.cover,
                           )
                         : Icon(
                             errorIconData ?? Icons.error,
                             color: imageColor ?? Colors.red,
-                            size: (width ?? MediaQuery.of(context).size.width * .3) > (height ?? MediaQuery.of(context).size.width * .3)
-                                ? (height ?? MediaQuery.of(context).size.width * .3)
-                                : (width ?? MediaQuery.of(context).size.width * .3),
+                            size: (width ??
+                                        MediaQuery.of(context).size.width *
+                                            .3) >
+                                    (height ??
+                                        MediaQuery.of(context).size.width * .3)
+                                ? (height ??
+                                    MediaQuery.of(context).size.width * .3)
+                                : (width ??
+                                    MediaQuery.of(context).size.width * .3),
                           );
                   }),
               height: height ?? MediaQuery.of(context).size.width * .3,
@@ -166,7 +201,15 @@ class ImagePreview extends StatefulWidget {
   bool isAppBarShow;
   Color? appBarColor;
 
-  ImagePreview({Key? key, required this.imageList, required this.index, this.title, this.titleColor = Colors.black, this.isAppBarShow = true, this.appBarColor}) : super(key: key);
+  ImagePreview(
+      {Key? key,
+      required this.imageList,
+      required this.index,
+      this.title,
+      this.titleColor = Colors.black,
+      this.isAppBarShow = true,
+      this.appBarColor})
+      : super(key: key);
 
   @override
   _ImagePreviewState createState() => _ImagePreviewState();
@@ -199,7 +242,8 @@ class _ImagePreviewState extends State<ImagePreview> {
         children: [
           Container(
             width: size.width,
-            height: size.height - (MediaQuery.of(context).padding.top + kToolbarHeight),
+            height: size.height -
+                (MediaQuery.of(context).padding.top + kToolbarHeight),
             decoration: const BoxDecoration(
               gradient: RadialGradient(
                 colors: [
@@ -212,7 +256,8 @@ class _ImagePreviewState extends State<ImagePreview> {
               minScale: 0.5,
               maxScale: 3.0,
               child: NetworkImageWidget(
-                height: size.height - (MediaQuery.of(context).padding.top + kToolbarHeight),
+                height: size.height -
+                    (MediaQuery.of(context).padding.top + kToolbarHeight),
                 width: size.width,
                 image: widget.imageList[widget.index],
                 boxFit: BoxFit.contain,
@@ -339,6 +384,9 @@ class _NetworkImageWidgetState extends State<NetworkImageWidget> {
   Widget build(BuildContext context) {
     return widget.border == NetworkImageBorder.Rectangle
         ? _imageWidget()
-        : ClipRRect(borderRadius: BorderRadius.circular(MediaQuery.of(context).size.height), child: _imageWidget());
+        : ClipRRect(
+            borderRadius:
+                BorderRadius.circular(MediaQuery.of(context).size.height),
+            child: _imageWidget());
   }
 }
