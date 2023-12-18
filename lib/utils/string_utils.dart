@@ -29,19 +29,27 @@ String chatTimeAgo({required String date}) {
                   : "Just now";
 }
 
-String getTimeFromSecond(String? second, {String? secondSuffix = 's',String? minuteSuffix = 'm',String? hourSuffix = 'h',}){
-  if(second==null || second.isEmpty){
+String getTimeFromSecond(
+  String? second, {
+  String? secondSuffix = 's',
+  String? minuteSuffix = 'm',
+  String? hourSuffix = 'h',
+}) {
+  if (second == null || second.isEmpty) {
     return '0';
   }
   int givenSec = double.parse(second).floor();
-  int hour =( givenSec/3600).floor();
-  int minute =(( givenSec % 3600) /60).floor();
-  int sec =(( givenSec % 3600) %60);
+  int hour = (givenSec / 3600).floor();
+  int minute = ((givenSec % 3600) / 60).floor();
+  int sec = ((givenSec % 3600) % 60);
 
-  return '${hour!=0?'$hour $hourSuffix':''} ${minute!=0?'$minute $minuteSuffix':''} ${sec!=0?'$sec $secondSuffix':''}';
+  return '${hour != 0 ? '$hour $hourSuffix' : ''} ${minute != 0 ? '$minute $minuteSuffix' : ''} ${sec != 0 ? '$sec $secondSuffix' : ''}';
 }
 
 String getTime(String data) {
+  // if (data.contains(' minute, ')) {
+  //   data.replaceAll(' minute, ', ':');
+  // }
   if (data.length == 3) {
     return "${data.replaceAll(':', '')} m 00 s";
   } else if (data.length == 5) {
@@ -54,7 +62,11 @@ String getTime(String data) {
           ? "${data.substring(0, data.indexOf(' hour,'))} h ${data.substring(data.indexOf('hour,') + 6, data.indexOf(':'))} m 0 s"
           : "${data.substring(0, data.indexOf(' hour,'))} h ${data.substring(data.indexOf('hour,') + 6, data.indexOf(':'))} m ${data.substring(data.indexOf(':') + 1, data.length)} s";
     } else if (data.toLowerCase().contains('minute')) {
-      return "${data.substring(0, data.indexOf(' minute,'))} m ${data.substring(data.indexOf('minute,') + 8, data.length)} s";
+      if (data.toLowerCase().contains('hour')) {
+        return "${data.substring(0, data.indexOf(' hour,'))} h ${data.substring(data.indexOf('hour,') + 6, data.indexOf(' minute,'))} m ${data.substring(data.indexOf('minute,') + 8, data.length)} s";
+      } else {
+        return "${data.substring(0, data.indexOf(':'))} h ${data.substring(data.indexOf(':') + 2, data.indexOf(' minute,'))} m ${data.substring(data.indexOf('minute,') + 8, data.length)} s";
+      }
     } else {
       return "";
     }
@@ -81,10 +93,10 @@ String findAndRemove(String rawStringData, String key, String nextPattern) {
   }
   String newString = rawStringData;
   while (newString.isNotEmpty && newString.contains(key)) {
-  final getIndex = newString.indexOf(key);
-  final subS = newString.substring(getIndex);
-  final patternFind = subS.substring(0, subS.indexOf(nextPattern) + 1);
-  newString = newString.replaceAll(patternFind, '');
+    final getIndex = newString.indexOf(key);
+    final subS = newString.substring(getIndex);
+    final patternFind = subS.substring(0, subS.indexOf(nextPattern) + 1);
+    newString = newString.replaceAll(patternFind, '');
   }
   return newString;
 }
