@@ -46,6 +46,7 @@ class CustomTextField extends StatefulWidget {
   final Color? suffixIconColor;
   final Color? errorFillColor;
   final Color? errorColor;
+  final Color? disableBorderColor;
   final TextAlign textAlign;
 
   const CustomTextField({
@@ -93,6 +94,7 @@ class CustomTextField extends StatefulWidget {
     this.errorColor,
     this.errorFillColor,
     this.textAlign = TextAlign.start,
+    this.disableBorderColor,
   }) : super(key: key);
 
   @override
@@ -213,6 +215,13 @@ class _CustomTextFieldState extends State<CustomTextField> {
                                   width: widget.borderWidth ?? 1,
                                 ),
                               ),
+                        disabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(widget.borderRadius ?? 5),
+                          borderSide: BorderSide(
+                            color: widget.disableBorderColor ?? Colors.grey,
+                            width: widget.borderWidth ?? 1,
+                          ),
+                        ),
                         labelText: widget.isLabelSeparated ? null : widget.labelText,
                         isDense: true,
                         suffixIcon: widget.isPassword
