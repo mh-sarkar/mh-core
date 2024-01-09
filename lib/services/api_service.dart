@@ -104,7 +104,7 @@ class ServiceAPI {
   }) async {
     dynamic response;
     try {
-      final result = await InternetAddress.lookup('google.com'); 
+      final result = await InternetAddress.lookup('google.com');
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
         globalLogger.d(result.map((e) => e.toString()).toList());
         // showSnackBar(msg: 'connected');
@@ -155,28 +155,28 @@ class ServiceAPI {
             response = await http.Response.fromStream(res);
           } else {
             response = (httpMethod == HttpMethod.get
-                ? await http.get(urlL, headers: noNeedAuthToken ? headers : authHeader).timeout(const Duration(seconds: 20), onTimeout: () {
+                ? await http.get(urlL, headers: noNeedAuthToken ? headers : authHeader).timeout(const Duration(seconds: 90), onTimeout: () {
                     return http.Response('Token Error', 500);
                   }).catchError((e) {
                     globalLogger.e(e.toString());
                     return http.Response('Token Error', 500);
                   })
                 : httpMethod == HttpMethod.post
-                    ? await http.post(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding).timeout(const Duration(seconds: 20), onTimeout: () {
+                    ? await http.post(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding).timeout(const Duration(seconds: 90), onTimeout: () {
                         return http.Response('Token Error', 500);
                       }).catchError((e) {
                         globalLogger.e(e.toString());
                         return http.Response('Token Error', 500);
                       })
                     : httpMethod == HttpMethod.put
-                        ? await http.put(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding).timeout(const Duration(seconds: 20), onTimeout: () {
+                        ? await http.put(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding).timeout(const Duration(seconds: 90), onTimeout: () {
                             return http.Response('Token Error', 500);
                           }).catchError((e) {
                             globalLogger.e(e.toString());
                             return http.Response('Token Error', 500);
                           })
                         : httpMethod == HttpMethod.patch
-                            ? await http.patch(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding).timeout(const Duration(seconds: 20),
+                            ? await http.patch(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding).timeout(const Duration(seconds: 90),
                                 onTimeout: () {
                                 return http.Response('Token Error', 500);
                               }).catchError((e) {
