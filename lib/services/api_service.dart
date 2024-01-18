@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mh_core/utils/color/custom_color.dart';
 import 'package:mh_core/utils/global.dart';
+import 'package:mh_core/utils/string_utils.dart';
 import 'package:mh_core/widgets/button/custom_button.dart';
 
 enum HttpMethod { get, post, put, patch, del, multipartFilePost }
@@ -310,7 +311,7 @@ class ServiceAPI {
           child: Text("Error"),
         ),
         content: Text(
-          message,
+          errorMessageJson(message),
           textAlign: TextAlign.center,
         ),
         actions: [
