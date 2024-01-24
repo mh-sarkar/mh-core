@@ -61,7 +61,11 @@ class CustomNetworkImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(ServiceAPI.url! +( networkImagePath[0] == '/'
+        ? networkImagePath.substring(1)
+        : networkImagePath) );
     return GestureDetector(
+
       onTap: isPreviewPageNeed
           ? () => Navigator.push(
                 context,
@@ -71,16 +75,16 @@ class CustomNetworkImage extends StatelessWidget {
                         [
                           networkImagePath.contains('http') || networkImagePath.contains(ServiceAPI.url!.replaceAll(ServiceAPI.apiUrl!.replaceAll(ServiceAPI.url!, ""), ''))
                               ? networkImagePath
-                              : ServiceAPI.url! + networkImagePath[0] == '/'
+                              : ServiceAPI.url! +( networkImagePath[0] == '/'
                                   ? networkImagePath.substring(1)
-                                  : networkImagePath,
+                                  : networkImagePath),
                         ],
                     index: imagePathList?.indexOf(
                             networkImagePath.contains('http') || networkImagePath.contains(ServiceAPI.url!.replaceAll(ServiceAPI.apiUrl!.replaceAll(ServiceAPI.url!, ""), ''))
                                 ? networkImagePath
-                                : ServiceAPI.url! + networkImagePath[0] == '/'
+                                : ServiceAPI.url! +( networkImagePath[0] == '/'
                                     ? networkImagePath.substring(1)
-                                    : networkImagePath) ??
+                                    : networkImagePath)) ??
                         0,
                     title: previewPageTitle,
                     titleColor: previewPageTitleColor,
@@ -100,9 +104,9 @@ class CustomNetworkImage extends StatelessWidget {
             child: Image.network(
               networkImagePath.contains('http') || networkImagePath.contains(ServiceAPI.url!.replaceAll(ServiceAPI.apiUrl!.replaceAll(ServiceAPI.url!, ""), ''))
                   ? networkImagePath
-                  : ServiceAPI.url! + networkImagePath[0] == '/'
+                  : ServiceAPI.url! + (networkImagePath[0] == '/'
                       ? networkImagePath.substring(1)
-                      : networkImagePath,
+                      : networkImagePath),
               fit: fit ?? BoxFit.cover,
               color: imageColor,
               loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
