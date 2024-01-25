@@ -3,6 +3,20 @@ import 'package:mh_core/services/api_service.dart';
 import 'package:mh_core/utils/color/custom_color.dart';
 import 'package:mh_core/utils/image_utils.dart';
 
+/// [getImageUrl] is a function for get image url from api
+/// [url] is your image url
+/// [getImageUrl] return image url
+/// Define [getImageUrl] when is from api url
+///
+String getImageUrl(String url) {
+  return url.contains('http') || url.contains(ServiceAPI.url!.replaceAll(ServiceAPI.apiUrl!.replaceAll(ServiceAPI.url!, ""), ''))
+      ? url
+      : ServiceAPI.url! + (url.isNotEmpty? url[0] == '/'
+      ? url.substring(1)
+      : url:'');
+}
+
+/// [CustomNetworkImage] is a custom image widget
 /// [isFromAPI] is define your image from api or internet
 /// [apiUrl] if [isFromAPI] then apiUrl is required
 /// [apiUrl] if [isFromAPI] then [apiExtraSlag] is optional
@@ -61,9 +75,6 @@ class CustomNetworkImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(ServiceAPI.url! +( networkImagePath[0] == '/'
-        ? networkImagePath.substring(1)
-        : networkImagePath) );
     return GestureDetector(
 
       onTap: isPreviewPageNeed
@@ -73,18 +84,10 @@ class CustomNetworkImage extends StatelessWidget {
                   builder: (context) => ImagePreview(
                     imageList: imagePathList ??
                         [
-                          networkImagePath.contains('http') || networkImagePath.contains(ServiceAPI.url!.replaceAll(ServiceAPI.apiUrl!.replaceAll(ServiceAPI.url!, ""), ''))
-                              ? networkImagePath
-                              : ServiceAPI.url! +( networkImagePath[0] == '/'
-                                  ? networkImagePath.substring(1)
-                                  : networkImagePath),
+                          getImageUrl( networkImagePath),
                         ],
                     index: imagePathList?.indexOf(
-                            networkImagePath.contains('http') || networkImagePath.contains(ServiceAPI.url!.replaceAll(ServiceAPI.apiUrl!.replaceAll(ServiceAPI.url!, ""), ''))
-                                ? networkImagePath
-                                : ServiceAPI.url! +( networkImagePath[0] == '/'
-                                    ? networkImagePath.substring(1)
-                                    : networkImagePath)) ??
+                        getImageUrl( networkImagePath)) ??
                         0,
                     title: previewPageTitle,
                     titleColor: previewPageTitleColor,
@@ -102,11 +105,7 @@ class CustomNetworkImage extends StatelessWidget {
           width: width ?? MediaQuery.of(context).size.width * .3,
           child: Center(
             child: Image.network(
-              networkImagePath.contains('http') || networkImagePath.contains(ServiceAPI.url!.replaceAll(ServiceAPI.apiUrl!.replaceAll(ServiceAPI.url!, ""), ''))
-                  ? networkImagePath
-                  : ServiceAPI.url! + (networkImagePath[0] == '/'
-                      ? networkImagePath.substring(1)
-                      : networkImagePath),
+              getImageUrl( networkImagePath),
               fit: fit ?? BoxFit.cover,
               color: imageColor,
               loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
