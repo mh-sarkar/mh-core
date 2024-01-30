@@ -134,7 +134,7 @@ class CustomNetworkImage extends StatelessWidget {
                     });*/
 
                     Container(
-                  color: Colors.white,
+                  color:backgroundColor,  
                   height: height ?? MediaQuery.of(context).size.width * .3,
                   width: width ?? MediaQuery.of(context).size.width * .3,
                   child: Center(

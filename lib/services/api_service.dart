@@ -303,7 +303,7 @@ class ServiceAPI {
   }
 
   ///Alert Dialog
-  static void showAlert(String message, {Widget? errorHandleButton, Function()? onPressed}) {
+  static void showAlert(dynamic message, {Widget? errorHandleButton, Function()? onPressed}) {
     showDialog(
       context: navigatorKey!.currentContext!,
       builder: (context) => AlertDialog(
