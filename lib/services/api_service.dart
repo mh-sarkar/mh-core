@@ -157,21 +157,21 @@ class ServiceAPI {
           } else {
             response = (httpMethod == HttpMethod.get
                 ? await http.get(urlL, headers: noNeedAuthToken ? headers : authHeader).timeout(const Duration(seconds: 90), onTimeout: () {
-                    return http.Response('Token Error', 500);
+                    return http.Response('Token Error', 1080);
                   }).catchError((e) {
                     globalLogger.e(e.toString());
                     return http.Response('Token Error', 500);
                   })
                 : httpMethod == HttpMethod.post
                     ? await http.post(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding).timeout(const Duration(seconds: 90), onTimeout: () {
-                        return http.Response('Token Error', 500);
+                        return http.Response('Token Error', 1080);
                       }).catchError((e) {
                         globalLogger.e(e.toString());
                         return http.Response('Token Error', 500);
                       })
                     : httpMethod == HttpMethod.put
                         ? await http.put(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding).timeout(const Duration(seconds: 90), onTimeout: () {
-                            return http.Response('Token Error', 500);
+                            return http.Response('Token Error', 1080);
                           }).catchError((e) {
                             globalLogger.e(e.toString());
                             return http.Response('Token Error', 500);
@@ -179,7 +179,7 @@ class ServiceAPI {
                         : httpMethod == HttpMethod.patch
                             ? await http.patch(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding).timeout(const Duration(seconds: 90),
                                 onTimeout: () {
-                                return http.Response('Token Error', 500);
+                                return http.Response('Token Error', 1080);
                               }).catchError((e) {
                                 globalLogger.e(e.toString());
                                 return http.Response('Token Error', 500);
@@ -232,11 +232,12 @@ class ServiceAPI {
             return jsonDecode(response.body);
           } else if (defaultErrorMsgShow) {
             if (response.statusCode == 400) {
-              showAlert("The request was invalid!");
+              showAlert("The request was invalid!", title: 'Invalid Request');
             } else if (response.statusCode == 401) {
               if (!is401Call) {
                 is401Call = true;
                 showAlert("Invalid login credentials!",
+                    title: 'Unauthorized',
                     errorHandleButton: isErrorHandleButtonExists
                         ? CustomButton(
                             primary: Colors.red,
@@ -246,23 +247,27 @@ class ServiceAPI {
                           )
                         : null);
               }
+            } else if (response.statusCode == 1080) {
+              showAlert("The server took too long to respond. Please check your internet connection and try again.", title: 'Server Timeout');
             } else if (response.statusCode == 403) {
-              showAlert("You do not have enough permissions to perform this action!");
+              showAlert("You do not have enough permissions to perform this action.", title: 'Permission Denied');
             } else if (response.statusCode == 404) {
-              showAlert("The requested resource not found!");
+              showAlert("The requested resource not found.", title: 'Resource Not Available');
             } else if (response.statusCode == 405) {
-              showAlert("This request is not supported by the resource!");
+              showAlert("This request is not supported by the resource.", title: 'Error Message');
             } else if (response.statusCode == 409) {
-              showAlert("The request could not be completed due to a conflict!");
+              showAlert("The request could not be completed due to a conflict.", title: 'Conflict Error');
             } else if (response.statusCode == 429) {
-              showAlert("Server is busy now!");
+              showAlert("Server is busy now. Please wait a moment and try again.", title: 'Rate Limit Exceeded');
             } else if (response.statusCode == 500) {
               // isErrorHandleButtonExists
               //     ?
               if (!is500Call) {
                 is500Call = true;
 
-                showAlert("The request was not completed due to an internal error on the server side!", onPressed: () {
+                showAlert(
+                    /*"The request was not completed due to an internal error on the server side!"*/ "We're experiencing technical difficulties. Please try again in a few minutes.",
+                    title: 'Temporary Server Issue', onPressed: () {
                   is500Call = false;
                   navigatorKey!.currentState!.pop();
                 },
@@ -303,12 +308,12 @@ class ServiceAPI {
   }
 
   ///Alert Dialog
-  static void showAlert(dynamic message, {Widget? errorHandleButton, Function()? onPressed}) {
+  static void showAlert(dynamic message, {String? title, Widget? errorHandleButton, Function()? onPressed}) {
     showDialog(
       context: navigatorKey!.currentContext!,
       builder: (context) => AlertDialog(
-        title: const Center(
-          child: Text("Error"),
+        title: Center(
+          child: Text(title ?? "Error"),
         ),
         content: Text(
           errorMessageJson(message),
