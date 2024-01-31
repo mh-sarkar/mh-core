@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:mh_ui/mh_ui.dart';
 
-Locale? locale;
-final globalLogger = Logger();
-GlobalKey<NavigatorState>? navigatorKey;
-GlobalKey<ScaffoldMessengerState>? snackbarKey;
 bool isNoNetworkProblem = false;
 bool is401Call = false;
 bool isNoInternetCall = false;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mh_core/utils/global.dart';
+import 'package:mh_ui/mh_ui.dart';
 
 String getTitle(String englishName, String banglaName) {
   return locale == const Locale('en', 'US') ? englishName : banglaName;

@@ -3,10 +3,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:mh_core/utils/color/custom_color.dart';
 import 'package:mh_core/utils/global.dart';
 import 'package:mh_core/utils/string_utils.dart';
-import 'package:mh_core/widgets/button/custom_button.dart';
+import 'package:mh_ui/mh_ui.dart';
 
 enum HttpMethod { get, post, put, patch, del, multipartFilePost }
 
@@ -15,26 +14,6 @@ enum HttpPurpose { restAPI, webScraping }
 String stringifyCookies(Map<String, String> cookies) => cookies.entries.map((e) => '${e.key}=${e.value}').join('; ');
 
 class ServiceAPI {
-  static domain(String path) => _url = path;
-  static get url => _url;
-  static extraSlag(String? path) => _apiUrl = _url + (path ?? '');
-  static get apiUrl => _apiUrl;
-  static get getCookie => _setCookie;
-  static get getToken => _authToken;
-  static setCookie(String cookie) => _setCookie = cookie;
-  static setAuthToken(String token) => _authToken = token;
-  static setAuthTokenKey(String key) => _authTokenKey = key;
-  static setAuthTokenPrefix(String prefix) => _authTokenPrefix = prefix;
-  static delAuthToken(_) => _authToken = '';
-  static String _url = '';
-  static String _apiUrl = '';
-  static String _authToken = '';
-  static String _setCookie = '';
-  static String _authTokenPrefix = 'Bearer ';
-  static String _authTokenKey = 'Authorization';
-
-  // static const String apiUrl = "http://pos.wiztecbd.online/api/";
-
   /// Multiple data add on multiple fields
   /// [allInfoField] defile as
   /// allInfoField =
@@ -117,13 +96,13 @@ class ServiceAPI {
           showProgressDialog(loadingMessage);
         }
         try {
-          final authHeader = {
+          final Map<String, String> authHeader = {
             if (needJsonContentType) 'Content-Type': 'application/json; charset=UTF-8',
             if (needJsonAccept) 'Accept': 'application/json',
-            _authTokenKey: '$_authTokenPrefix$_authToken',
-            if (needCookie) 'Cookie': _setCookie.replaceAll(";", "; "),
+            Service.getTokenKey: '${Service.getTokenPrefix}${Service.getToken}',
+            if (needCookie) 'Cookie': Service.getCookie.replaceAll(";", "; "),
           };
-          globalLogger.d('$_authTokenPrefix $_authToken');
+          globalLogger.d('${Service.getTokenPrefix} ${Service.getToken}');
           final urlL = Uri.parse(url);
           if (httpMethod == HttpMethod.multipartFilePost) {
             var request = http.MultipartRequest("POST", urlL);
@@ -188,7 +167,7 @@ class ServiceAPI {
           }
           globalLogger.d(response.body);
           if ((response as http.Response).headers['set-cookie'] != null) {
-            _setCookie = (response)
+            final _setCookie = (response)
                 .headers['set-cookie']!
                 .toString()
                 .split(";")
@@ -205,6 +184,7 @@ class ServiceAPI {
                 .replaceAll("]", "")
                 .replaceAll(", ", "");
             globalLogger.d(_setCookie, "_setCookie");
+            Service.setCookie(_setCookie);
           }
           globalLogger.d(response.statusCode);
           if (isLoadingEnable) {

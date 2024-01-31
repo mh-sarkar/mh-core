@@ -15,19 +15,13 @@ dependencies:
   path_provider: ^2.0.15
 
   #Use for network call
-  http: ^1.1.0
+  http: ^1.2.0
+
+  mh_ui:
+    path: ../mh_ui
 
   #Use for time date
   intl: ^0.18.0
-
-#  #Use for video play
-#  video_player: ^2.6.1
-#
-#  #Use for system volume control
-#  perfect_volume_control: ^1.0.5
-#
-#  #Use for html parse
-#  html: ^0.15.3
 
   #Use for pick image from gallery or camera
   image_picker: ^1.0.1
