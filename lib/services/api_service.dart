@@ -77,6 +77,7 @@ class ServiceAPI {
     bool needCookie = false,
     bool needJsonContentType = true,
     bool needJsonAccept = true,
+    bool debugEnable = false,
     String? errorButtonLabel,
     String? loadingMessage,
     Function()? errorButtonPressed,
@@ -86,7 +87,7 @@ class ServiceAPI {
     try {
       final result = await InternetAddress.lookup('google.com');
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        globalLogger.d(result.map((e) => e.toString()).toList());
+        if (debugEnable) globalLogger.d(result.map((e) => e.toString()).toList());
         // showSnackBar(msg: 'connected');
         if (isNoInternetCall) {
           isNoInternetCall = false;
@@ -102,7 +103,7 @@ class ServiceAPI {
             Service.getTokenKey: '${Service.getTokenPrefix}${Service.getToken}',
             if (needCookie) 'Cookie': Service.getCookie.replaceAll(";", "; "),
           };
-          globalLogger.d('${Service.getTokenPrefix} ${Service.getToken}');
+          if (debugEnable) globalLogger.d('${Service.getTokenPrefix} ${Service.getToken}');
           final urlL = Uri.parse(url);
           if (httpMethod == HttpMethod.multipartFilePost) {
             var request = http.MultipartRequest("POST", urlL);
@@ -126,7 +127,7 @@ class ServiceAPI {
                     files.add(f);
                   }
                   request.files.addAll(files);
-                  globalLogger.d(multipleImageListWithKeyValue[i]['key']);
+                  if (debugEnable) globalLogger.d(multipleImageListWithKeyValue[i]['key']);
                 }
               }
             }
@@ -135,37 +136,38 @@ class ServiceAPI {
             response = await http.Response.fromStream(res);
           } else {
             response = (httpMethod == HttpMethod.get
-                ? await http.get(urlL, headers: noNeedAuthToken ? headers : authHeader).timeout(const Duration(seconds: 90), onTimeout: () {
+                ? await http.get(urlL, headers: noNeedAuthToken ? headers : authHeader).timeout(const Duration(seconds: 2000), onTimeout: () {
                     return http.Response('Token Error', 1080);
                   }).catchError((e) {
-                    globalLogger.e(e.toString());
+                    if (debugEnable) globalLogger.e(e.toString());
                     return http.Response('Token Error', 500);
                   })
                 : httpMethod == HttpMethod.post
-                    ? await http.post(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding).timeout(const Duration(seconds: 90), onTimeout: () {
+                    ? await http.post(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding).timeout(const Duration(seconds: 2000), onTimeout: () {
                         return http.Response('Token Error', 1080);
                       }).catchError((e) {
-                        globalLogger.e(e.toString());
+                        if (debugEnable) globalLogger.e(e.toString());
                         return http.Response('Token Error', 500);
                       })
                     : httpMethod == HttpMethod.put
-                        ? await http.put(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding).timeout(const Duration(seconds: 90), onTimeout: () {
+                        ? await http.put(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding).timeout(const Duration(seconds: 2000),
+                            onTimeout: () {
                             return http.Response('Token Error', 1080);
                           }).catchError((e) {
-                            globalLogger.e(e.toString());
+                            if (debugEnable) globalLogger.e(e.toString());
                             return http.Response('Token Error', 500);
                           })
                         : httpMethod == HttpMethod.patch
-                            ? await http.patch(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding).timeout(const Duration(seconds: 90),
+                            ? await http.patch(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding).timeout(const Duration(seconds: 2000),
                                 onTimeout: () {
                                 return http.Response('Token Error', 1080);
                               }).catchError((e) {
-                                globalLogger.e(e.toString());
+                                if (debugEnable) globalLogger.e(e.toString());
                                 return http.Response('Token Error', 500);
                               })
                             : await http.delete(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding));
           }
-          globalLogger.d(response.body);
+          if (debugEnable) globalLogger.d(response.body);
           if ((response as http.Response).headers['set-cookie'] != null) {
             final _setCookie = (response)
                 .headers['set-cookie']!
@@ -183,10 +185,10 @@ class ServiceAPI {
                 .replaceAll("[", "")
                 .replaceAll("]", "")
                 .replaceAll(", ", "");
-            globalLogger.d(_setCookie, "_setCookie");
+            if (debugEnable) globalLogger.d(_setCookie, "_setCookie");
             Service.setCookie(_setCookie);
           }
-          globalLogger.d(response.statusCode);
+          if (debugEnable) globalLogger.d(response.statusCode);
           if (isLoadingEnable) {
             navigatorKey!.currentState!.pop();
           }
@@ -273,7 +275,7 @@ class ServiceAPI {
           }
           return jsonDecode(response.body);
         } catch (e) {
-          globalLogger.e(e);
+          if (debugEnable) globalLogger.e(e);
           return showErrorResponse ? response : {};
         }
       }
