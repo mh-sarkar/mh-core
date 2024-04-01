@@ -80,6 +80,8 @@ class ServiceAPI {
     bool debugEnable = false,
     String? errorButtonLabel,
     String? loadingMessage,
+    Widget? loadingWidget,
+    bool needLoadingMsg = false,
     Function()? errorButtonPressed,
     Function()? onInternetError,
   }) async {
@@ -94,7 +96,7 @@ class ServiceAPI {
           snackbarKey!.currentState?.clearSnackBars();
         }
         if (isLoadingEnable) {
-          showProgressDialog(loadingMessage);
+          showProgressDialog(loadingMessage, loadingWidget, needLoadingMsg: needLoadingMsg);
         }
         try {
           final Map<String, String> authHeader = {
@@ -136,21 +138,21 @@ class ServiceAPI {
             response = await http.Response.fromStream(res);
           } else {
             response = (httpMethod == HttpMethod.get
-                ? await http.get(urlL, headers: noNeedAuthToken ? headers : authHeader).timeout(const Duration(seconds: 2000), onTimeout: () {
+                ? await http.get(urlL, headers: noNeedAuthToken ? headers : authHeader).timeout(const Duration(seconds: 180), onTimeout: () {
                     return http.Response('Token Error', 1080);
                   }).catchError((e) {
                     if (debugEnable) globalLogger.e(e.toString());
                     return http.Response('Token Error', 500);
                   })
                 : httpMethod == HttpMethod.post
-                    ? await http.post(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding).timeout(const Duration(seconds: 2000), onTimeout: () {
+                    ? await http.post(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding).timeout(const Duration(seconds: 180), onTimeout: () {
                         return http.Response('Token Error', 1080);
                       }).catchError((e) {
                         if (debugEnable) globalLogger.e(e.toString());
                         return http.Response('Token Error', 500);
                       })
                     : httpMethod == HttpMethod.put
-                        ? await http.put(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding).timeout(const Duration(seconds: 2000),
+                        ? await http.put(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding).timeout(const Duration(seconds: 180),
                             onTimeout: () {
                             return http.Response('Token Error', 1080);
                           }).catchError((e) {
@@ -158,7 +160,7 @@ class ServiceAPI {
                             return http.Response('Token Error', 500);
                           })
                         : httpMethod == HttpMethod.patch
-                            ? await http.patch(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding).timeout(const Duration(seconds: 2000),
+                            ? await http.patch(urlL, headers: noNeedAuthToken ? headers : authHeader, body: body, encoding: encoding).timeout(const Duration(seconds: 180),
                                 onTimeout: () {
                                 return http.Response('Token Error', 1080);
                               }).catchError((e) {
@@ -185,7 +187,7 @@ class ServiceAPI {
                 .replaceAll("[", "")
                 .replaceAll("]", "")
                 .replaceAll(", ", "");
-            if (debugEnable) globalLogger.d(_setCookie, "_setCookie");
+            if (debugEnable) globalLogger.d(_setCookie);
             Service.setCookie(_setCookie);
           }
           if (debugEnable) globalLogger.d(response.statusCode);
@@ -317,25 +319,38 @@ class ServiceAPI {
   }
 
   ///Alert Dialog
-  static void showProgressDialog(String? msg, {Widget? errorHandleButton, Color? loadingColor}) {
+  static void showProgressDialog(String? msg, Widget? loadingWidget, {Widget? errorHandleButton, Color? loadingColor, bool needLoadingMsg = false}) {
     showDialog(
       context: navigatorKey!.currentContext!,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 20, top: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        title: Text(
-          msg ?? 'Please Wait',
-          textAlign: TextAlign.center,
-        ),
-        titlePadding: const EdgeInsets.only(top: 16),
+        title: (Service.getNeedLoadingMsg)
+            ? Text(
+                msg ?? 'Please Wait',
+                textAlign: TextAlign.center,
+              )
+            : needLoadingMsg
+                ? Text(
+                    msg ?? 'Please Wait',
+                    textAlign: TextAlign.center,
+                  )
+                : null,
+        titlePadding: Service.getNeedLoadingMsg
+            ? const EdgeInsets.only(top: 16)
+            : needLoadingMsg
+                ? const EdgeInsets.only(top: 16)
+                : null,
         content: SizedBox(
           width: 40,
           height: 40,
           child: Center(
-            child: CircularProgressIndicator(
-              color: loadingColor ?? CustomColor.kPrimaryColor,
-            ),
+            child: loadingWidget ??
+                Service.getLoadingWidget ??
+                CircularProgressIndicator(
+                  color: loadingColor ?? CustomColor.kPrimaryColor,
+                ),
           ),
         ),
       ),

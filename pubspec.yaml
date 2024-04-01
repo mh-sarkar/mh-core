@@ -15,11 +15,11 @@ dependencies:
   #Use for network call
   http: ^1.2.0
 
-  mh_ui:
-#    path: ../mh_ui
-    git:
-      url: https://github.com/mh-sarkar/mh-ui.git
-      ref: alpha
+  mh_ui: #^0.0.1+4
+    path: ../mh_ui
+#    git:
+#      url: https://github.com/mh-sarkar/mh-ui.git
+#      ref: alpha
 
   #Use for time date
   intl: ^0.18.0

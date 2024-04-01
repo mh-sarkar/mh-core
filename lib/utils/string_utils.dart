@@ -133,13 +133,21 @@ String getTotalTime(List<String> list) {
 }
 
 dynamic errorMessageJson(dynamic errorMessage) {
-  if (errorMessage.runtimeType == String) {
+  if (errorMessage.runtimeType.toString() == 'String') {
     return errorMessage;
+  } else if (errorMessage.runtimeType.toString() == '_Map<String, dynamic>') {
+    final list = [];
+    try {
+      errorMessage.forEach((k, v) {
+        if (v.runtimeType.toString() == 'String') {
+          list.add(v);
+        } else {
+          list.addAll(v);
+        }
+      });
+    } catch (e) {
+      globalLogger.e(e);
+    }
+    return list.toString().replaceAll(',', "\n").replaceAll("[", "").replaceAll("]", "");
   }
-  final list = [];
-  errorMessage.forEach((k, v) {
-    final data = v;
-    list.addAll(data);
-  });
-  return list.toString().replaceAll(',', "\n").replaceAll("[", "").replaceAll("]", "");
 }
