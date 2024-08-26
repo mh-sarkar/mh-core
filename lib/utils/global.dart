@@ -6,6 +6,8 @@ bool isNoNetworkProblem = false;
 bool is401Call = false;
 bool isNoInternetCall = false;
 bool is500Call = false;
+bool show500Error = true;
+bool show429Error = true;
 int snackBarDurationInSec = 4;
 void onInternet({Function()? onRetry}) {
   snackbarKey!.currentState?.showSnackBar(

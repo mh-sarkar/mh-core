@@ -241,9 +241,9 @@ class ServiceAPI {
               showAlert("This request is not supported by the resource.", title: 'Error Message');
             } else if (response.statusCode == 409) {
               showAlert("The request could not be completed due to a conflict.", title: 'Conflict Error');
-            } else if (response.statusCode == 429) {
+            } else if (response.statusCode == 429 && show429Error) {
               showAlert("Server is busy now. Please wait a moment and try again.", title: 'Rate Limit Exceeded');
-            } else if (response.statusCode == 500) {
+            } else if (response.statusCode == 500 && show500Error) {
               // isErrorHandleButtonExists
               //     ?
               if (!is500Call) {
@@ -272,7 +272,8 @@ class ServiceAPI {
             } else if (response.statusCode == 503) {
               showAlert("The server was unavailable!");
             } else {
-              showAlert("Something went wrong!");
+              if (debugEnable) globalLogger.e("Something went wrong!");
+              // showAlert("Something went wrong!");
             }
           }
           return jsonDecode(response.body);
