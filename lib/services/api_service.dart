@@ -231,7 +231,8 @@ class ServiceAPI {
                           )
                         : null);
               }
-            } else if (response.statusCode == 1080) {
+            } else if (response.statusCode == 1080 && show1080Error) {
+              navigatorKey!.currentState!.pop();
               showAlert("The server took too long to respond. Please check your internet connection and try again.", title: 'Server Timeout');
             } else if (response.statusCode == 403) {
               showAlert("You do not have enough permissions to perform this action.", title: 'Permission Denied');
