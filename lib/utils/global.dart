@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:logger/logger.dart';
 import 'package:mh_ui/mh_ui.dart';
 
 bool isNoNetworkProblem = false;

@@ -16,13 +16,13 @@ dependencies:
   http: ^1.2.0
 
   mh_ui: #^0.0.1+4
-    path: ../mh_ui
+    path: ../mh-ui
 #    git:
 #      url: https://github.com/mh-sarkar/mh-ui.git
 #      ref: alpha
 
   #Use for time date
-  intl: ^0.18.0
+  intl: ^0.17.0
 
   #Use for pick image from gallery or camera
   image_picker: ^1.0.1
